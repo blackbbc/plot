@@ -27,52 +27,50 @@ POINTS ptOld;
 HDC hMemDC = NULL;
 HINSTANCE mHinstance;
 
+BOOLEAN isLButtonDown;
+
+
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	POINTS pt;
-	HWND hwnd2;
-	HBITMAP hBmp;
 
-	HPEN hpen;
-	HPEN hpenOld;
-
-	HBRUSH hbr;
-	HBRUSH hbrOld;
-
-	RECT rect;
+	static int nZoom = 0;
 
 	switch (Msg)
 	{
-	case WM_TIMER:
-		OutputDebugString(L"On Timer\n");
-		break;
 	case WM_MOUSEMOVE:
 		pt = MAKEPOINTS(lParam);
-		//hdc = GetDC(hwnd);
 
-		//MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
-		//LineTo(hdc, pt.x, pt.y);
-		//ptOld = pt;
-		//LineTo(hdc, pt.x, pt.y);
+		if (isLButtonDown) 
+		{
+			hdc = GetDC(hwnd);
 
-		//ReleaseDC(hwnd, hdc);
+			MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
+			LineTo(hdc, pt.x, pt.y);
+			ptOld = pt;
 
+			ReleaseDC(hwnd, hdc);
+		}
 		break;
 	case WM_LBUTTONDOWN:
-		//drawSomething(hwnd);
-		//hdc = GetDC(hwnd);
-		//hMemDC = CreateCompatibleDC(hdc);
-		//ReleaseDC(hwnd, hdc);
-		//InvalidateRect(hwnd, NULL, TRUE);
-
-		//SetTimer(hwnd, 0, 1000, NULL);
-
-		//hwnd2 = CreateWindow(L"HELLO", L"2", WS_OVERLAPPEDWINDOW, 600, 600, 200, 200, NULL, NULL, mHinstance, NULL);
-		//ShowWindow(hwnd2, SW_SHOWNORMAL);
+		if (isLButtonDown == FALSE) {
+			//do something
+			ptOld = MAKEPOINTS(lParam);
+			OutputDebugString(L"LButtonDown\n");
+		}
+		isLButtonDown = TRUE;
 		break;
-	case WM_RBUTTONDOWN:
-		//KillTimer(hwnd, 0);
+	case WM_LBUTTONUP:
+		if (isLButtonDown == TRUE) {
+			//do something
+			OutputDebugString(L"LButtonUp\n");
+		}
+		isLButtonDown = FALSE;
+		break;
+	case WM_MOUSEWHEEL:
+		((short)HIWORD(wParam) < 0) ? nZoom-- : nZoom++;
+		OutputDebugString(L"On MouseWheel\n");
 		break;
 	case WM_PAINT:
 		PAINTSTRUCT ps;
