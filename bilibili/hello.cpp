@@ -4,26 +4,23 @@
 
 #include <windows.h>
 
-void drawSomething(HWND &hwnd)
+void onPaint(HDC &hdc) 
 {
-	HDC hdc = GetDC(hwnd);
-	HPEN hpen = CreatePen(PS_DASH, 1, RGB(255, 0, 0));
-	HBRUSH hbrush = CreateSolidBrush(RGB(0, 0, 255));
+	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	HBRUSH hbrush = CreateSolidBrush(RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 	HBRUSH hbrushOld= (HBRUSH)SelectObject(hdc, hbrush);
+	SelectObject(hdc, hbrush);
 
-	MoveToEx(hdc, 100, 100, NULL);
-	LineTo(hdc, 200, 100);
-	LineTo(hdc, 200, 200);
-	LineTo(hdc, 300, 200);
-	Rectangle(hdc, 10, 10, 100, 100);
-	TextOut(hdc, 100, 100, L"Hello World", 11);
+	MoveToEx(hdc, 0, 360, NULL);
+	LineTo(hdc, 1280, 360);
+	MoveToEx(hdc, 640, 0, NULL);
+	LineTo(hdc, 640, 720);
 
 	SelectObject(hdc, hpenOld);
 	SelectObject(hdc, hbrushOld);
 	DeleteObject(hpen);
 	DeleteObject(hbrush);
-	ReleaseDC(hwnd, hdc);
 }
 
 POINTS ptOld;
@@ -47,23 +44,19 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	switch (Msg)
 	{
-	case 9999:
-		::OutputDebugString(L"Message Received\n");
-		break;
 	case WM_TIMER:
 		OutputDebugString(L"On Timer\n");
 		break;
 	case WM_MOUSEMOVE:
 		pt = MAKEPOINTS(lParam);
-		hdc = GetDC(hwnd);
+		//hdc = GetDC(hwnd);
 
+		//MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
+		//LineTo(hdc, pt.x, pt.y);
+		//ptOld = pt;
+		//LineTo(hdc, pt.x, pt.y);
 
-		MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
-		LineTo(hdc, pt.x, pt.y);
-		ptOld = pt;
-		LineTo(hdc, pt.x, pt.y);
-
-		ReleaseDC(hwnd, hdc);
+		//ReleaseDC(hwnd, hdc);
 
 		break;
 	case WM_LBUTTONDOWN:
@@ -75,34 +68,16 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 		//SetTimer(hwnd, 0, 1000, NULL);
 
-		//PostMessage(hwnd, 9999, 0, 0);
 		//hwnd2 = CreateWindow(L"HELLO", L"2", WS_OVERLAPPEDWINDOW, 600, 600, 200, 200, NULL, NULL, mHinstance, NULL);
 		//ShowWindow(hwnd2, SW_SHOWNORMAL);
-		hdc = GetDC(hwnd);
-		hMemDC = CreateCompatibleDC(hdc);
-
-		hBmp = CreateCompatibleBitmap(hdc, 500, 500);
-
-		SelectObject(hMemDC, hBmp);
-
-		ReleaseDC(hwnd, hdc);
 		break;
 	case WM_RBUTTONDOWN:
 		//KillTimer(hwnd, 0);
-		hdc = GetDC(hwnd);
-		BitBlt(hdc, 0, 0, 500, 500, hMemDC, 0, 0, SRCCOPY);
-
-		rect = { 0, 0, 500, 500 };
-		InvalidateRect(hwnd, &rect, TRUE);
-
 		break;
 	case WM_PAINT:
-		OutputDebugString(L"On WM_PAINT\n");
 		PAINTSTRUCT ps;
 		hdc = BeginPaint(hwnd, &ps);
-
-		//BitBlt(hdc, 0, 0, 500, 500, hMemDC, 0, 0, SRCCOPY);
-
+		onPaint(hdc);
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_DESTROY:
@@ -136,7 +111,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		L"HELLO", 
 		L"WindowName", 
 		WS_OVERLAPPEDWINDOW,
-		500, 500, 800, 600, 
+		200, 200, 1280, 720, 
 		NULL, 
 		NULL, 
 		hInstance, 
