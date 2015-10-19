@@ -116,11 +116,6 @@ void drawTick(HDC &hdc)
 	DeleteObject(hpen);
 }
 
-void drawGrid(HDC &hdc)
-{
-
-}
-
 void drawFunction(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
@@ -136,7 +131,6 @@ void onPaint(HDC &hdc)
 {
 	drawCoordinate(hdc);
 	drawTick(hdc);
-	drawGrid(hdc);
 	drawFunction(hdc);
 }
 
@@ -144,6 +138,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
 	POINTS pt;
+	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
+	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
 	static int nZoom = 0;
 
@@ -166,6 +162,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
 			//do something
+			SetCursor(hCursHand);
 			ptOld = MAKEPOINTS(lParam);
 			OutputDebugString(L"LButtonDown\n");
 		}
@@ -174,6 +171,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 		if (isLButtonDown == TRUE) {
 			//do something
+			SetCursor(hCursArrow);
 			OutputDebugString(L"LButtonUp\n");
 		}
 		isLButtonDown = FALSE;
