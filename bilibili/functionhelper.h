@@ -1,5 +1,6 @@
 #pragma once
 
+#include <windows.h>
 #include <vector>
 #include <cmath>
 #include "config.h"
@@ -10,19 +11,34 @@ class FunctionHelper
 {
 private:
 	char *_func;
-	double _xLeft;
-	double _xRight;
-	double _yLeft;
-	double _yRight;
+	DOUBLE _xLeft;
+	DOUBLE _xRight;
+	DOUBLE _yLeft;
+	DOUBLE _yRight;
+	DOUBLE _xTickDistance;
+	DOUBLE _yTickDistance;
+	DOUBLE _xTickLebels;
+	DOUBLE _yTickLabels;
+	BOOLEAN showGrid;
 public:
 	FunctionHelper::FunctionHelper(char *func);
 
-	void setXRange(double left, double right);
+	void setXRange(DOUBLE left, DOUBLE right);
 
-	void setYRange(double left, double right);
+	void setYRange(DOUBLE left, DOUBLE right);
 
-	vector<double> getXVec();
+	void setXTickDistance(DOUBLE xTickDistance);
+
+	void setYTickDistance(DOUBLE yTickDistance);
+
+	DOUBLE getXRangeLength();
+
+	DOUBLE getYRangeLength();
+
+	vector<DOUBLE> getXVec();
 	
-	vector<double> getYVec();
+	vector<DOUBLE> getYVec();
+
+	void draw(HDC &hdc);
 
 };

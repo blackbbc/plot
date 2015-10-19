@@ -36,22 +36,8 @@ void drawFunction(HDC &hdc)
 
 	funcHelper.setXRange(-4, 4);
 	funcHelper.setYRange(-1, 1);
-	vector<double> xVec = funcHelper.getXVec();
-	vector<double> yVec = funcHelper.getYVec();
 
-	for (int i = 0; i < xVec.size(); i++)
-	{
-		double percentX = (xVec[i] + 4) / 8;
-		double percentY = (yVec[i] + 1) / 2;
-		if (i == 0)
-		{
-			MoveToEx(hdc, WINDOW_WIDTH * percentX, WINDOW_HEIGHT * percentY, NULL);
-		}
-		else
-		{
-			LineTo(hdc, WINDOW_WIDTH * percentX, WINDOW_HEIGHT * percentY);
-		}
-	}
+	funcHelper.draw(hdc);
 
 	SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
