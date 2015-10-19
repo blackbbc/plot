@@ -13,7 +13,7 @@ static DOUBLE X_TICK_DISTANCE = 1;
 static DOUBLE Y_TICK_DISTANCE = 1;
 static INT X_TICK_LABEL = 5;
 static INT Y_TICK_LABEL = 5;
+static BOOLEAN SHOW_GRID = TRUE;
 
 DOUBLE getXRangeLength();
-
 DOUBLE getYRangeLength();

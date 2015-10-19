@@ -116,9 +116,100 @@ void drawTick(HDC &hdc)
 	DeleteObject(hpen);
 }
 
+void drawGrid(HDC &hdc)
+{
+	if (!SHOW_GRID)
+		return;
+
+	HPEN gridPen = CreatePen(PS_SOLID, 2, RGB(192, 192, 192));
+	HPEN gridBoldPen = CreatePen(PS_SOLID, 2, RGB(153, 153, 153));
+	HPEN hpenOld = (HPEN)SelectObject(hdc, gridPen);
+
+	INT tick = 0;
+	wstring tickNumber;
+	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		if (tick % 5 == 0)
+		{
+			SelectObject(hdc, gridBoldPen);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+		}
+		else
+		{
+			SelectObject(hdc, gridPen);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+		}
+	}
+
+	tick = 0;
+	for (INT i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		if (tick % 5 == 0)
+		{
+			SelectObject(hdc, gridBoldPen);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+		}
+		else
+		{
+			SelectObject(hdc, gridPen);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+		}
+	}
+
+	tick = 0;
+	for (INT i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		if (tick % 5 == 0)
+		{
+			SelectObject(hdc, gridBoldPen);
+			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+		}
+		else
+		{
+			SelectObject(hdc, gridPen);
+			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+		}
+	}
+
+	tick = 0;
+	for (INT i = -Y_TICK_DISTANCE; i > X_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		if (tick % 5 == 0)
+		{
+			SelectObject(hdc, gridBoldPen);
+			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+		}
+		else
+		{
+			SelectObject(hdc, gridPen);
+			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+		}
+	}
+
+	SelectObject(hdc, hpenOld);
+	DeleteObject(gridPen);
+	DeleteObject(gridBoldPen);
+}
+
 void drawFunction(HDC &hdc)
 {
-	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 136, 255));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
 	funcHelper.draw(hdc);
@@ -129,6 +220,7 @@ void drawFunction(HDC &hdc)
 
 void onPaint(HDC &hdc) 
 {
+	drawGrid(hdc);
 	drawCoordinate(hdc);
 	drawTick(hdc);
 	drawFunction(hdc);
