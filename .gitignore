@@ -1,4 +1,8 @@
 Debug/
+bilibili/bilibili.vcxproj
+bilibili/bilibili.vcxproj.filters
+bilibili/bilibili.vcxproj.user
+bilibili.opensdf
 bilibili.sdf
 bilibili.sln
 bilibili.v12.suo
