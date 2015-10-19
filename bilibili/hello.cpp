@@ -28,14 +28,26 @@ void drawCoordinate(HDC &hdc)
 	DeleteObject(hpen);
 }
 
+void drawTick(HDC &hdc)
+{
+	POINT center = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
+	for (INT i = 0; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	{
+
+	}
+
+}
+
+void drawGrid(HDC &hdc)
+{
+
+}
+
 void drawFunction(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 	SelectObject(hdc, hpen);
-
-	funcHelper.setXRange(-4, 4);
-	funcHelper.setYRange(-1, 1);
 
 	funcHelper.draw(hdc);
 
@@ -46,6 +58,8 @@ void drawFunction(HDC &hdc)
 void onPaint(HDC &hdc) 
 {
 	drawCoordinate(hdc);
+	drawTick(hdc);
+	drawGrid(hdc);
 	drawFunction(hdc);
 }
 
