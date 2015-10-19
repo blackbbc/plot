@@ -3,6 +3,7 @@
 #endif 
 
 #include <windows.h>
+#include <string>
 #include "functionhelper.h"
 #include "config.h"
 
@@ -35,19 +36,22 @@ void drawTick(HDC &hdc)
 	POINT center = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
 
 	INT tick = 0;
+	wstring tickNumber;
 	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 340, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 380);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+			tickNumber = to_wstring(i);
+			TextOut(hdc, WINDOW_WIDTH * percent, 370, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 355, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 365);
 		}
 	}
 
@@ -58,13 +62,15 @@ void drawTick(HDC &hdc)
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 340, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 380);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+			tickNumber = to_wstring(i);
+			TextOut(hdc, WINDOW_WIDTH * percent, 370, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 355, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 365);
 		}
 	}
 
@@ -75,13 +81,15 @@ void drawTick(HDC &hdc)
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, 620, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 660, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+			tickNumber = to_wstring(i);
+			TextOut(hdc, 615, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, 635, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 645, WINDOW_HEIGHT * percent);
 		}
 	}
 
@@ -92,13 +100,15 @@ void drawTick(HDC &hdc)
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, 620, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 660, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+			tickNumber = to_wstring(i);
+			TextOut(hdc, 615, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, 635, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 645, WINDOW_HEIGHT * percent);
 		}
 	}
 

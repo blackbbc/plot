@@ -30,8 +30,8 @@ vector<DOUBLE> FunctionHelper::getYVec()
 	for (INT i = 0; i < 2 * WINDOW_WIDTH; i++)
 	{
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
-		//double y = 2 * x;
-		DOUBLE y = 10 * sin(x);
+		DOUBLE y = x * x;
+		//DOUBLE y = 10 * sin(x);
 		y = -y;
 		temp.push_back(y);
 	}
