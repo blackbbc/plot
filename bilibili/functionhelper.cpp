@@ -31,7 +31,7 @@ vector<DOUBLE> FunctionHelper::getYVec()
 	{
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
 		//double y = 2 * x;
-		DOUBLE y = sin(x);
+		DOUBLE y = 10 * sin(x);
 		y = -y;
 		temp.push_back(y);
 	}

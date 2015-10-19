@@ -17,7 +17,6 @@ void drawCoordinate(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
-	SelectObject(hdc, hpen);
 
 	MoveToEx(hdc, 0, 360, NULL);
 	LineTo(hdc, 1280, 360);
@@ -30,12 +29,81 @@ void drawCoordinate(HDC &hdc)
 
 void drawTick(HDC &hdc)
 {
-	POINT center = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
-	for (INT i = 0; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
-	{
+	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
+	POINT center = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
+
+	INT tick = 0;
+	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		if (tick % 5 == 0)
+		{
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 340, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 380);
+		}
+		else
+		{
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+		}
 	}
 
+	tick = 0;
+	for (INT i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		if (tick % 5 == 0)
+		{
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 340, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 380);
+		}
+		else
+		{
+			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, 370);
+		}
+	}
+
+	tick = 0;
+	for (INT i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		if (tick % 5 == 0)
+		{
+			MoveToEx(hdc, 620, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 660, WINDOW_HEIGHT * percent);
+		}
+		else
+		{
+			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+		}
+	}
+
+	tick = 0;
+	for (INT i = -Y_TICK_DISTANCE; i > X_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	{
+		tick++;
+		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		if (tick % 5 == 0)
+		{
+			MoveToEx(hdc, 620, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 660, WINDOW_HEIGHT * percent);
+		}
+		else
+		{
+			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
+		}
+	}
+
+	SelectObject(hdc, hpenOld);
+	DeleteObject(hpen);
 }
 
 void drawGrid(HDC &hdc)
@@ -47,7 +115,6 @@ void drawFunction(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
-	SelectObject(hdc, hpen);
 
 	funcHelper.draw(hdc);
 
