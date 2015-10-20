@@ -189,13 +189,13 @@ void drawGrid(HDC &hdc)
 		{
 			SelectObject(hdc, gridBoldPen);
 			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 		else
 		{
 			SelectObject(hdc, gridPen);
 			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 	}
 
@@ -208,13 +208,13 @@ void drawGrid(HDC &hdc)
 		{
 			SelectObject(hdc, gridBoldPen);
 			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 		else
 		{
 			SelectObject(hdc, gridPen);
 			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 720);
+			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 	}
 
@@ -228,13 +228,13 @@ void drawGrid(HDC &hdc)
 		{
 			SelectObject(hdc, gridBoldPen);
 			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 		else
 		{
 			SelectObject(hdc, gridPen);
 			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 	}
 
@@ -248,13 +248,13 @@ void drawGrid(HDC &hdc)
 		{
 			SelectObject(hdc, gridBoldPen);
 			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 		else
 		{
 			SelectObject(hdc, gridPen);
 			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 1280, WINDOW_HEIGHT * percent);
+			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 	}
 
@@ -290,7 +290,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
-	int nZoom = 0;
+	INT nZoom = 0;
 
 	switch (Msg)
 	{
@@ -305,7 +305,6 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			ORIGIN_POINT.y += pt.y - ptOld.y;
 			//MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
 			//LineTo(hdc, pt.x, pt.y);
-
 			invalidWindow(hwnd);
 
 			ptOld = pt;
@@ -339,6 +338,12 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		hdc = BeginPaint(hwnd, &ps);
 		onPaint(hdc);
 		EndPaint(hwnd, &ps);
+		break;
+	case WM_SIZE:
+		WINDOW_WIDTH = LOWORD(lParam);
+		WINDOW_HEIGHT = HIWORD(lParam);
+		invalidWindow(hwnd);
+		OutputDebugString(L"On Size\n");
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);
