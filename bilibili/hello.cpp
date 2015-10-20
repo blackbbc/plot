@@ -17,11 +17,13 @@ FunctionHelper funcHelper("2x");
 void initGraph()
 {
 	DOUBLE leftSpace, rightSpace;
+
+	//计算X的范围
 	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= WINDOW_WIDTH)
 	{
 		leftSpace = ORIGIN_POINT.x;
 		rightSpace = WINDOW_WIDTH - ORIGIN_POINT.x;
-		X_RANGE_LEFT = -(leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL);
+		X_RANGE_LEFT = -leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 		X_RANGE_RIGHT = rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 	}
 	else if (ORIGIN_POINT.x < 0)
@@ -38,6 +40,31 @@ void initGraph()
 		X_RANGE_LEFT = -leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 		X_RANGE_RIGHT = -rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 	}
+
+	//计算Y的范围
+	DOUBLE topSpace, bottomSpace;
+	if (ORIGIN_POINT.y >= 0 && ORIGIN_POINT.y <= WINDOW_HEIGHT)
+	{
+		bottomSpace = WINDOW_HEIGHT - ORIGIN_POINT.y;
+		topSpace = ORIGIN_POINT.y;
+		Y_RANGE_LEFT = -bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+		Y_RANGE_RIGHT = topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+	}
+	else if (ORIGIN_POINT.y < 0)
+	{
+		bottomSpace = -ORIGIN_POINT.y;
+		topSpace = bottomSpace + WINDOW_HEIGHT;
+		Y_RANGE_LEFT = -topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+		Y_RANGE_RIGHT = -bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+	}
+	else
+	{
+		bottomSpace = ORIGIN_POINT.y - WINDOW_HEIGHT;
+		topSpace = ORIGIN_POINT.y;
+		Y_RANGE_LEFT = bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+		Y_RANGE_RIGHT = topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
+	}
+
 }
 
 void drawCoordinate(HDC &hdc)

@@ -19,7 +19,7 @@ static INT Y_TICK_LABEL = 5;
 
 static BOOLEAN SHOW_GRID = TRUE;
 
-static POINT ORIGIN_POINT = { 100, 100 };
+static POINT ORIGIN_POINT = { -100, 900 };
 
 DOUBLE getXRangeLength();
 DOUBLE getYRangeLength();
