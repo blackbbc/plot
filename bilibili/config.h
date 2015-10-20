@@ -23,3 +23,5 @@ extern POINT ORIGIN_POINT;
 
 extern DOUBLE getXRangeLength();
 extern DOUBLE getYRangeLength();
+
+extern void invalidWindow(HWND &hwnd);
