@@ -89,7 +89,7 @@ void drawTick(HDC &hdc)
 
 	INT tick = 0;
     std::wstring tickNumber;
-	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	for (DOUBLE i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
@@ -108,7 +108,7 @@ void drawTick(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	for (DOUBLE i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
@@ -127,7 +127,7 @@ void drawTick(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	for (DOUBLE i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE temp = getYRangeLength();
@@ -148,7 +148,7 @@ void drawTick(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (DOUBLE i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
@@ -182,7 +182,7 @@ void drawGrid(HDC &hdc)
 
 	INT tick = 0;
 	std::wstring tickNumber;
-	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	for (DOUBLE i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
@@ -201,7 +201,7 @@ void drawGrid(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	for (DOUBLE i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
@@ -220,7 +220,7 @@ void drawGrid(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	for (DOUBLE i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
@@ -240,7 +240,7 @@ void drawGrid(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (DOUBLE i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
@@ -294,21 +294,28 @@ void zoom(INT wheelDelta)
 	yDelta = ORIGIN_POINT.y - nCenter.y;
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
-	if (zDelta < 5)
-		return;
-
 	if (wheelDelta > 0)
 	{
 		//Zoom In
-		ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
-		ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+		if (zDelta > 10)
+		{
+			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
+			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+		}
+		X_TICK_DISTANCE /= 1.2;
+		Y_TICK_DISTANCE /= 1.2;
 	}
 	else
 	{
 		//Zoom Out
 		zoomCoefficient = -zoomCoefficient;
-		ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
-		ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+		if (zDelta > 10)
+		{
+			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
+			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+		}
+		X_TICK_DISTANCE *= 1.2;
+		Y_TICK_DISTANCE *= 1.2;
 	}
 }
 
