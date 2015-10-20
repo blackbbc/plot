@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include <string>
+#include <cmath>
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
@@ -283,6 +284,34 @@ void onPaint(HDC &hdc)
 	drawFunction(hdc);
 }
 
+void zoom(INT wheelDelta)
+{
+	DOUBLE xDelta, yDelta, zDelta;
+	POINT nCenter = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
+	INT zoomCoefficient = 10;
+	
+	xDelta = ORIGIN_POINT.x - nCenter.x;
+	yDelta = ORIGIN_POINT.y - nCenter.y;
+	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
+
+	if (zDelta < 5)
+		return;
+
+	if (wheelDelta > 0)
+	{
+		//Zoom In
+		ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
+		ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+	}
+	else
+	{
+		//Zoom Out
+		zoomCoefficient = -zoomCoefficient;
+		ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
+		ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
+	}
+}
+
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -290,7 +319,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
-	INT nZoom = 0;
+	INT wheelDelta;
+	std::wstring msg;
 
 	switch (Msg)
 	{
@@ -330,8 +360,11 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 		break;
 	case WM_MOUSEWHEEL:
-		((short)HIWORD(wParam) < 0) ? nZoom-- : nZoom++;
-		OutputDebugString(L"On MouseWheel\n");
+		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+		msg = std::to_wstring(wheelDelta);
+		OutputDebugString(msg.c_str());
+		zoom(wheelDelta);
+		invalidWindow(hwnd);
 		break;
 	case WM_PAINT:
 		PAINTSTRUCT ps;
