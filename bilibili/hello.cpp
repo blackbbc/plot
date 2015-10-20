@@ -223,6 +223,7 @@ void drawGrid(HDC &hdc)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
 			SelectObject(hdc, gridBoldPen);
@@ -238,10 +239,11 @@ void drawGrid(HDC &hdc)
 	}
 
 	tick = 0;
-	for (INT i = -Y_TICK_DISTANCE; i > X_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (INT i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
 			SelectObject(hdc, gridBoldPen);
