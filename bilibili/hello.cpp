@@ -82,13 +82,26 @@ void drawCoordinate(HDC &hdc)
 	DeleteObject(hpen);
 }
 
+wchar_t *getFormat()
+{
+	if (getXRangeLength() > 10)
+	{
+		return L"%.0f";
+	}
+	else
+	{
+		return L"%.1f";
+	}
+}
+
 void drawTick(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
 	INT tick = 0;
-    std::wstring tickNumber;
+	wchar_t buffer[100];
+	std::wstring tickNumber;
 	for (DOUBLE i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
@@ -97,7 +110,8 @@ void drawTick(HDC &hdc)
 		{
 			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
-			tickNumber = std::to_wstring(i);
+			swprintf(buffer, 100, getFormat(), i);
+			tickNumber = buffer;
 			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
@@ -116,7 +130,8 @@ void drawTick(HDC &hdc)
 		{
 			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
-			tickNumber = std::to_wstring(i);
+			swprintf(buffer, 100, getFormat(), i);
+			tickNumber = buffer;
 			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
@@ -137,7 +152,8 @@ void drawTick(HDC &hdc)
 		{
 			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
 			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
-			tickNumber = std::to_wstring(i);
+			swprintf(buffer, 100, getFormat(), i);
+			tickNumber = buffer;
 			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
@@ -157,7 +173,8 @@ void drawTick(HDC &hdc)
 		{
 			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
 			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
-			tickNumber = std::to_wstring(i);
+			swprintf(buffer, 100, getFormat(), i);
+			tickNumber = buffer;
 			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
