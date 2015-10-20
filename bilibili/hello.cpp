@@ -290,6 +290,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
+	RECT rect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
 	static int nZoom = 0;
 
 	switch (Msg)
@@ -301,8 +303,13 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			hdc = GetDC(hwnd);
 
-			MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
-			LineTo(hdc, pt.x, pt.y);
+			ORIGIN_POINT.x += pt.x - ptOld.x;
+			ORIGIN_POINT.y += pt.y - ptOld.y;
+			//MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
+			//LineTo(hdc, pt.x, pt.y);
+
+			InvalidateRect(hwnd, &rect, TRUE);
+
 			ptOld = pt;
 
 			ReleaseDC(hwnd, hdc);
