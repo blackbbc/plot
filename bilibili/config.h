@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <vector>
 
 extern INT WINDOW_WIDTH;
 extern INT WINDOW_HEIGHT;
@@ -16,6 +17,13 @@ extern INT X_TICK_PIXEL;
 extern INT Y_TICK_PIXEL;
 extern INT X_TICK_LABEL;
 extern INT Y_TICK_LABEL;
+
+extern std::vector<INT> PIXEL_TYPE;
+extern std::vector<INT> DISTANCE_TYPE;
+
+extern DOUBLE RATIO;
+extern INT PIXEL_ROUND;
+extern INT DISTANCE_ROUND;
 
 extern BOOLEAN SHOW_GRID;
 

@@ -84,13 +84,17 @@ void drawCoordinate(HDC &hdc)
 
 wchar_t *getFormat()
 {
-	if (getXRangeLength() > 10)
+	if (RATIO >= 0.01 && RATIO < 0.1)
 	{
-		return L"%.0f";
+		return L"%.2f";
+	}
+	else if (RATIO >= 0.1 && RATIO < 1)
+	{
+		return L"%.1f";
 	}
 	else
 	{
-		return L"%.1f";
+		return L"%.0f";
 	}
 }
 
@@ -319,8 +323,22 @@ void zoom(INT wheelDelta)
 			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
 		}
-		X_TICK_DISTANCE /= 1.2;
-		Y_TICK_DISTANCE /= 1.2;
+
+		PIXEL_ROUND = PIXEL_ROUND - 1;
+		if (PIXEL_ROUND == -1)
+		{
+			PIXEL_ROUND = PIXEL_TYPE.size() - 1;
+			DISTANCE_ROUND = DISTANCE_ROUND - 1;
+			if (DISTANCE_ROUND == -1)
+			{
+				DISTANCE_ROUND = DISTANCE_TYPE.size() - 1;
+				RATIO /= 10;
+			}
+			X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+			Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+		}
+		X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+		Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 	}
 	else
 	{
@@ -331,8 +349,20 @@ void zoom(INT wheelDelta)
 			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
 		}
-		X_TICK_DISTANCE *= 1.2;
-		Y_TICK_DISTANCE *= 1.2;
+
+		PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
+		if (PIXEL_ROUND == 0)
+		{
+			DISTANCE_ROUND = (DISTANCE_ROUND + 1) % DISTANCE_TYPE.size();
+			if (DISTANCE_ROUND == 0)
+			{
+				RATIO *= 10;
+			}
+			X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+			Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+		}
+		X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+		Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 	}
 }
 

@@ -31,7 +31,7 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 	for (INT i = 0; i < 2 * WINDOW_WIDTH; i++)
 	{
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
-		DOUBLE y = x * x * x;
+		DOUBLE y = x * x;
 		//DOUBLE y = 10 * sin(x);
 		temp.push_back(y);
 	}
