@@ -1,11 +1,7 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 #include <vector>
-#include <cmath>
-#include "config.h"
-
-using namespace std;
 
 class FunctionHelper
 {
@@ -14,9 +10,9 @@ private:
 public:
 	FunctionHelper::FunctionHelper(char *func);
 
-	vector<DOUBLE> getXVec();
+	std::vector<DOUBLE> getXVec();
 	
-	vector<DOUBLE> getYVec();
+	std::vector<DOUBLE> getYVec();
 
 	void draw(HDC &hdc);
 };

@@ -1,13 +1,14 @@
 #include "functionhelper.h"
+#include "config.h"
 
 FunctionHelper::FunctionHelper (char *func)
 {
 	this->_func = func;
 }
 
-vector<DOUBLE> FunctionHelper::getXVec()
+std::vector<DOUBLE> FunctionHelper::getXVec()
 {
-	vector<DOUBLE> temp;
+	std::vector<DOUBLE> temp;
 
 	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH / 2;
 
@@ -21,9 +22,9 @@ vector<DOUBLE> FunctionHelper::getXVec()
 
 }
 
-vector<DOUBLE> FunctionHelper::getYVec()
+std::vector<DOUBLE> FunctionHelper::getYVec()
 {
-	vector<DOUBLE> temp;
+	std::vector<DOUBLE> temp;
 
 	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH / 2;
 
@@ -40,8 +41,8 @@ vector<DOUBLE> FunctionHelper::getYVec()
 
 void FunctionHelper::draw(HDC &hdc)
 {
-	vector<DOUBLE> xVec = getXVec();
-	vector<DOUBLE> yVec = getYVec();
+	std::vector<DOUBLE> xVec = getXVec();
+	std::vector<DOUBLE> yVec = getYVec();
 
 	for (INT i = 0; i < xVec.size(); i++)
 	{

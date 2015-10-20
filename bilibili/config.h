@@ -2,24 +2,24 @@
 
 #include <Windows.h>
 
-static INT WINDOW_WIDTH = 1280;
-static INT WINDOW_HEIGHT = 720;
+extern INT WINDOW_WIDTH;
+extern INT WINDOW_HEIGHT;
 
-static DOUBLE X_RANGE_LEFT = -17;
-static DOUBLE X_RANGE_RIGHT = 17;
-static DOUBLE Y_RANGE_LEFT = -10;
-static DOUBLE Y_RANGE_RIGHT = 10;
+extern DOUBLE X_RANGE_LEFT;
+extern DOUBLE X_RANGE_RIGHT;
+extern DOUBLE Y_RANGE_LEFT;
+extern DOUBLE Y_RANGE_RIGHT;
 
-static DOUBLE X_TICK_DISTANCE = 1;
-static DOUBLE Y_TICK_DISTANCE = 1;
-static INT X_TICK_PIXEL = 38;
-static INT Y_TICK_PIXEL = 38;
-static INT X_TICK_LABEL = 5;
-static INT Y_TICK_LABEL = 5;
+extern DOUBLE X_TICK_DISTANCE;
+extern DOUBLE Y_TICK_DISTANCE;
+extern INT X_TICK_PIXEL;
+extern INT Y_TICK_PIXEL;
+extern INT X_TICK_LABEL;
+extern INT Y_TICK_LABEL;
 
-static BOOLEAN SHOW_GRID = TRUE;
+extern BOOLEAN SHOW_GRID;
 
-static POINT ORIGIN_POINT = { -100, 900 };
+extern POINT ORIGIN_POINT;
 
-DOUBLE getXRangeLength();
-DOUBLE getYRangeLength();
+extern DOUBLE getXRangeLength();
+extern DOUBLE getYRangeLength();

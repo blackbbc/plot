@@ -4,8 +4,9 @@
 
 #include <windows.h>
 #include <string>
-#include "functionhelper.h"
+#include "hello.h"
 #include "config.h"
+#include "functionhelper.h"
 
 POINTS ptOld;
 HDC hMemDC = NULL;
@@ -16,9 +17,8 @@ FunctionHelper funcHelper("2x");
 
 void initGraph()
 {
-	DOUBLE leftSpace, rightSpace;
-
 	//¼ÆËãXµÄ·¶Î§
+	DOUBLE leftSpace, rightSpace;
 	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= WINDOW_WIDTH)
 	{
 		leftSpace = ORIGIN_POINT.x;
@@ -86,25 +86,23 @@ void drawTick(HDC &hdc)
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
-	POINT center = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
-
 	INT tick = 0;
-	wstring tickNumber;
+    std::wstring tickNumber;
 	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 370);
-			tickNumber = to_wstring(i);
-			TextOut(hdc, WINDOW_WIDTH * percent, 370, tickNumber.c_str(), tickNumber.size());
+			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			tickNumber = std::to_wstring(i);
+			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 355, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 365);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
@@ -115,15 +113,15 @@ void drawTick(HDC &hdc)
 		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 350, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 370);
-			tickNumber = to_wstring(i);
-			TextOut(hdc, WINDOW_WIDTH * percent, 370, tickNumber.c_str(), tickNumber.size());
+			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			tickNumber = std::to_wstring(i);
+			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 355, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, 365);
+			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
@@ -131,37 +129,40 @@ void drawTick(HDC &hdc)
 	for (INT i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
 	{
 		tick++;
+		DOUBLE temp = getYRangeLength();
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
-			tickNumber = to_wstring(i);
-			TextOut(hdc, 615, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			tickNumber = std::to_wstring(i);
+			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, 635, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 645, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
 		}
 	}
 
 	tick = 0;
-	for (INT i = -Y_TICK_DISTANCE; i > X_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (INT i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
 		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, 630, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 650, WINDOW_HEIGHT * percent);
-			tickNumber = to_wstring(i);
-			TextOut(hdc, 615, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			tickNumber = std::to_wstring(i);
+			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, 635, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, 645, WINDOW_HEIGHT * percent);
+			MoveToEx(hdc, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hdc, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
 		}
 	}
 
@@ -179,7 +180,7 @@ void drawGrid(HDC &hdc)
 	HPEN hpenOld = (HPEN)SelectObject(hdc, gridPen);
 
 	INT tick = 0;
-	wstring tickNumber;
+	std::wstring tickNumber;
 	for (INT i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
