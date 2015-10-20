@@ -9,11 +9,17 @@ static DOUBLE X_RANGE_LEFT = -17;
 static DOUBLE X_RANGE_RIGHT = 17;
 static DOUBLE Y_RANGE_LEFT = -10;
 static DOUBLE Y_RANGE_RIGHT = 10;
+
 static DOUBLE X_TICK_DISTANCE = 1;
 static DOUBLE Y_TICK_DISTANCE = 1;
+static INT X_TICK_PIXEL = 38;
+static INT Y_TICK_PIXEL = 38;
 static INT X_TICK_LABEL = 5;
 static INT Y_TICK_LABEL = 5;
+
 static BOOLEAN SHOW_GRID = TRUE;
+
+static POINT ORIGIN_POINT = { 100, 100 };
 
 DOUBLE getXRangeLength();
 DOUBLE getYRangeLength();

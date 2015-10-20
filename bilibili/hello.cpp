@@ -14,15 +14,41 @@ HINSTANCE mHinstance;
 BOOLEAN isLButtonDown;
 FunctionHelper funcHelper("2x");
 
+void initGraph()
+{
+	DOUBLE leftSpace, rightSpace;
+	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= WINDOW_WIDTH)
+	{
+		leftSpace = ORIGIN_POINT.x;
+		rightSpace = WINDOW_WIDTH - ORIGIN_POINT.x;
+		X_RANGE_LEFT = -(leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL);
+		X_RANGE_RIGHT = rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
+	}
+	else if (ORIGIN_POINT.x < 0)
+	{
+		leftSpace = -ORIGIN_POINT.x;
+		rightSpace = leftSpace + WINDOW_WIDTH;
+		X_RANGE_LEFT = leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
+		X_RANGE_RIGHT = rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
+	}
+	else
+	{
+		leftSpace = ORIGIN_POINT.x;
+		rightSpace = ORIGIN_POINT.x - WINDOW_WIDTH;
+		X_RANGE_LEFT = -leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
+		X_RANGE_RIGHT = -rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
+	}
+}
+
 void drawCoordinate(HDC &hdc)
 {
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
-	MoveToEx(hdc, 0, 360, NULL);
-	LineTo(hdc, 1280, 360);
-	MoveToEx(hdc, 640, 0, NULL);
-	LineTo(hdc, 640, 720);
+	MoveToEx(hdc, 0, ORIGIN_POINT.y, NULL);
+	LineTo(hdc, WINDOW_WIDTH, ORIGIN_POINT.y);
+	MoveToEx(hdc, ORIGIN_POINT.x, 0, NULL);
+	LineTo(hdc, ORIGIN_POINT.x, WINDOW_HEIGHT);
 
 	SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
@@ -220,6 +246,7 @@ void drawFunction(HDC &hdc)
 
 void onPaint(HDC &hdc) 
 {
+	initGraph();
 	drawGrid(hdc);
 	drawCoordinate(hdc);
 	drawTick(hdc);
