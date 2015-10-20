@@ -33,7 +33,6 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
 		DOUBLE y = x * x * x;
 		//DOUBLE y = 10 * sin(x);
-		y = -y;
 		temp.push_back(y);
 	}
 	return temp;
@@ -46,8 +45,9 @@ void FunctionHelper::draw(HDC &hdc)
 
 	for (INT i = 0; i < xVec.size(); i++)
 	{
-		DOUBLE percentX = (xVec[i] + getXRangeLength() / 2) / getXRangeLength();
-		DOUBLE percentY = (yVec[i] + getYRangeLength() / 2) / getYRangeLength();
+		DOUBLE percentX = (xVec[i] - X_RANGE_LEFT) / getXRangeLength();
+		DOUBLE percentY = (yVec[i] - Y_RANGE_LEFT) / getYRangeLength();
+		percentY = 1 - percentY;
 		if (i == 0)
 		{
 			MoveToEx(hdc, WINDOW_WIDTH * percentX, WINDOW_HEIGHT * percentY, NULL);
