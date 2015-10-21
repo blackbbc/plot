@@ -305,14 +305,14 @@ void onPaint(HDC &hdc)
 	drawFunction(hdc);
 }
 
-void zoom(INT wheelDelta)
+void zoom(INT wheelDelta, POINTS &p)
 {
 	DOUBLE xDelta, yDelta, zDelta;
 	POINT nCenter = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
 	INT zoomCoefficient = 10;
 	
-	xDelta = ORIGIN_POINT.x - nCenter.x;
-	yDelta = ORIGIN_POINT.y - nCenter.y;
+	xDelta = ORIGIN_POINT.x - p.x;
+	yDelta = ORIGIN_POINT.y - p.y;
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
 	if (wheelDelta > 0)
@@ -414,10 +414,11 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 		break;
 	case WM_MOUSEWHEEL:
+		pt = MAKEPOINTS(lParam);
 		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 		msg = std::to_wstring(wheelDelta);
 		OutputDebugString(msg.c_str());
-		zoom(wheelDelta);
+		zoom(wheelDelta, pt);
 		invalidWindow(hwnd);
 		break;
 	case WM_PAINT:

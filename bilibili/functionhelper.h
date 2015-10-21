@@ -14,5 +14,7 @@ public:
 	
 	std::vector<DOUBLE> getYVec();
 
+	DOUBLE getY(DOUBLE x);
+
 	void draw(HDC &hdc);
 };
