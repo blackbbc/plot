@@ -9,6 +9,7 @@
 #include "config.h"
 #include "functionhelper.h"
 
+POINTS pt;
 POINTS ptOld;
 HDC hMemDC = NULL;
 HINSTANCE mHinstance;
@@ -305,20 +306,31 @@ void onPaint(HDC &hdc)
 	drawFunction(hdc);
 }
 
-void zoom(INT wheelDelta, POINTS &p)
+void zoom(INT wheelDelta)
 {
 	DOUBLE xDelta, yDelta, zDelta;
-	POINT nCenter = { WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 };
 	INT zoomCoefficient = 10;
+
+	std::wstring msg;
+	msg = std::to_wstring(pt.x);
+	OutputDebugString(msg.c_str());
+	OutputDebugString(L"\n");
+	msg = std::to_wstring(pt.y);
+	OutputDebugString(msg.c_str());
+	OutputDebugString(L"\n");
 	
-	xDelta = ORIGIN_POINT.x - p.x;
-	yDelta = ORIGIN_POINT.y - p.y;
+	//以45°进行缩放
+	xDelta = ORIGIN_POINT.x - pt.x;
+	xDelta = xDelta / abs(xDelta);
+	yDelta = ORIGIN_POINT.y - pt.y;
+	yDelta = yDelta / abs(yDelta);
+
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
 	if (wheelDelta > 0)
 	{
 		//Zoom In
-		if (zDelta > 10)
+		if (zDelta > 0)
 		{
 			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
@@ -344,7 +356,7 @@ void zoom(INT wheelDelta, POINTS &p)
 	{
 		//Zoom Out
 		zoomCoefficient = -zoomCoefficient;
-		if (zDelta > 10)
+		if (zDelta > 0)
 		{
 			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
@@ -369,7 +381,6 @@ void zoom(INT wheelDelta, POINTS &p)
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
-	POINTS pt;
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
@@ -414,11 +425,10 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 		break;
 	case WM_MOUSEWHEEL:
-		pt = MAKEPOINTS(lParam);
 		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 		msg = std::to_wstring(wheelDelta);
-		OutputDebugString(msg.c_str());
-		zoom(wheelDelta, pt);
+		//OutputDebugString(msg.c_str());
+		zoom(wheelDelta);
 		invalidWindow(hwnd);
 		break;
 	case WM_PAINT:
