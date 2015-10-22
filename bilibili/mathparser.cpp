@@ -31,6 +31,7 @@ char *preProcessing(char *src)
 	char *result = new char[128];
 	while (src[i] != '\0')
 	{
+		//处理第一个字符是减号的问题
 		if (i == 0 && src[i] == '-')
 		{
 			result[j] = '0';
@@ -39,6 +40,7 @@ char *preProcessing(char *src)
 			j++;
 			i++;
 		}
+		//处理减号的问题
 		else if (src[i] == '(' && src[i + 1] == '-')
 		{
 			result[j] = src[i];
@@ -47,6 +49,7 @@ char *preProcessing(char *src)
 			result[j] = '0';
 			j++;
 		}
+		//处理函数缩写的问题
 		else if (isdigit(src[i]) && src[i + 1] == 'x')
 		{
 			result[j] = src[i];
@@ -83,6 +86,7 @@ char *getNumber(const char *src, int &i)
 	return number;
 }
 
+//如果匹配到一个op，就退出
 char *getOp(const char *src, int &i)
 {
 	char *op = new char[32];
@@ -101,17 +105,20 @@ char *getOp(const char *src, int &i)
 	return op;
 }
 
+//中缀转后缀
 std::queue<char *> getRPN(const char *src)
 {
 	int i = 0;
 	int n = strlen(src);
 	char *buffer;
-	std::stack<char *> expe;
-	std::queue<char *> rpn;
+	std::stack<char *> expe;  //存储符号栈
+	std::queue<char *> rpn;   //逆波兰表达式
 
 	expe.push("\0");
+	//处理表达式
 	while (i < n)
 	{
+		//如果是数字直接输出
 		if (isdigit(src[i]))
 		{
 			buffer = getNumber(src, i);
@@ -129,6 +136,7 @@ std::queue<char *> getRPN(const char *src)
 		}
 		else
 		{
+			//如果是左括号，直接入栈
 			if (src[i] == '(')
 			{
 				expe.push("(");
@@ -139,6 +147,7 @@ std::queue<char *> getRPN(const char *src)
 			{
 				i++;
 			}
+			//如果是右括号，出栈直到弹出第一个(
 			else if (src[i] == ')')
 			{
 				while (strcmp(expe.top(), "(") != 0)
@@ -150,16 +159,19 @@ std::queue<char *> getRPN(const char *src)
 				i++;
 				expe.pop();
 			}
+			//如果是其他运算符，根据运算符优先级确定是否进栈
 			else
 			{
 				buffer = getOp(src, i);
 				int a = pri[expe.top()];
 				int b = pri[buffer];
+				//如果非空且栈顶元素优先级大于当前符号，出栈
 				while ((!expe.empty()) && (pri[expe.top()] >= pri[buffer]))
 				{
 					rpn.push(expe.top());
 					expe.pop();
 				}
+				//插入当前算符
 				expe.push(buffer);
 			}
 		}
@@ -167,6 +179,7 @@ std::queue<char *> getRPN(const char *src)
 	return rpn;
 }
 
+//使用后缀表达式求值
 double countexp(std::queue<char *> &rpn)
 {
 	std::stack<double> ans;
@@ -175,16 +188,19 @@ double countexp(std::queue<char *> &rpn)
 
 	while (!rpn.empty())
 	{
+		//判断是不是数字
 		if (isdigit(rpn.front()[0]))
 		{
 			c = atof(rpn.front());
 			ans.push(c);
 		}
+		//判断是不是x
 		else if (strcmp(rpn.front(), "x") == 0)
 		{
 			ans.push(2);
 		}
 		else
+			//否则是算符
 		{
 			buffer = rpn.front();
 			if (strcmp(buffer, "+") == 0)
