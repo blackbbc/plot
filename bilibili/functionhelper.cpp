@@ -4,7 +4,9 @@
 
 FunctionHelper::FunctionHelper (char *func)
 {
-	this->_func = func;
+	initialParser();
+	this->_func = preProcessing(func);
+	this->_rpn = getRPN(this->_func);
 }
 
 std::vector<DOUBLE> FunctionHelper::getXVec()
@@ -40,7 +42,8 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 
 DOUBLE FunctionHelper::getY(DOUBLE x)
 {
-	return parse(_func, x);
+	std::queue<char *> rpn = std::queue<char *>(_rpn);
+	return countexp(rpn, x);
 }
 
 void FunctionHelper::draw(HDC &hdc)

@@ -2,11 +2,13 @@
 
 #include <Windows.h>
 #include <vector>
+#include <queue>
 
 class FunctionHelper
 {
 private:
 	char *_func;
+	std::queue<char *> _rpn;
 public:
 	FunctionHelper::FunctionHelper(char *func);
 

@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include <map>
 
 extern INT WINDOW_WIDTH;
 extern INT WINDOW_HEIGHT;
@@ -31,5 +32,7 @@ extern POINT ORIGIN_POINT;
 
 extern DOUBLE getXRangeLength();
 extern DOUBLE getYRangeLength();
+
+extern std::map<std::string, int> pri;
 
 extern void invalidWindow(HWND &hwnd);

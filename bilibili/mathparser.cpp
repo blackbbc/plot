@@ -1,11 +1,10 @@
 ﻿#include "mathparser.h"
+#include "config.h"
 
 #define M_PI "3.14159265358979323846"
 #define M_E  "2.71828182845904523536"
 
 using namespace std;
-
-map<std::string, int> pri;
 
 //预处理算符优先级
 void initialParser()
@@ -348,11 +347,4 @@ double countexp(queue<char *> &rpn, double xValue)
 
 	return ans.top();
 
-}
-
-double parse(char *expression, double xValue)
-{
-	char *processed = preProcessing(expression);
-	queue<char *> rpn = getRPN(processed);
-	return countexp(rpn, xValue);
 }

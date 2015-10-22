@@ -2,6 +2,7 @@
 
 #include <Windows.h>
 #include <vector>
+#include <map>
 
 INT WINDOW_WIDTH = 1280;
 INT WINDOW_HEIGHT = 720;
@@ -17,7 +18,7 @@ INT X_TICK_PIXEL = 60;
 INT Y_TICK_PIXEL = 60;
 INT X_TICK_LABEL = 5;
 INT Y_TICK_LABEL = 5;
-;
+
 std::vector<INT> PIXEL_TYPE = { 60, 55, 50, 45, 40 };
 std::vector<INT> DISTANCE_TYPE = { 1, 2, 5 };
 
@@ -31,5 +32,7 @@ POINT ORIGIN_POINT = {640, 360};
 
 DOUBLE getXRangeLength();
 DOUBLE getYRangeLength();
+
+std::map<std::string, int> pri;
 
 void invalidWindow(HWND &hwnd);
