@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
@@ -9,6 +10,8 @@
 #include <string>
 
 void initialParser();
+
+char *preProcessing(char *src);
 
 char *getNumber(const char *src, int &i);
 
