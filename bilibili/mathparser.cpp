@@ -1,6 +1,7 @@
 ﻿#include "mathparser.h"
 
 #define M_PI "3.14159265358979323846"
+#define M_E  "2.71828182845904523536"
 
 using namespace std;
 
@@ -20,7 +21,6 @@ void initialParser()
 	pri["atan"] = 8;
 	pri["ln"] = 8;
 	pri["log"] = 8;
-	pri["exp"] = 8;
 	pri["sqrt"] = 8;
 	pri["abs"] = 8;
 	pri["^"] = 7;
@@ -100,7 +100,7 @@ char *getOp(const char *src, int &i)
 	char *op = new char[32];
 	int j = 0;
 	int n = strlen(src);
-	while (i < n && !isdigit(src[i]) && src[i] != '.' && src[i] != '(' && src[i] != ')' && src[i] != ',')
+	while (i < n && !isdigit(src[i]) && src[i] != '.' && src[i] != '(' && src[i] != ')' && src[i] != ',' && src[i] != 'x' && src[i] != 'e')
 	{
 		op[j] = src[i];
 		i++;
@@ -141,6 +141,11 @@ queue<char *> getRPN(const char *src)
 		{
 			i += 2;
 			rpn.push(M_PI);
+		}
+		else if (src[i] == 'e')
+		{
+			i++;
+			rpn.push(M_E);
 		}
 		else
 		{
@@ -312,13 +317,6 @@ double countexp(queue<char *> &rpn, double xValue)
 				a = ans.top();
 				ans.pop();
 				c = log10(b) / log10(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "exp") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = exp(a);
 				ans.push(c);
 			}
 			else if (strcmp(buffer, "sqrt") == 0)

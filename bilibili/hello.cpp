@@ -15,7 +15,7 @@ HDC hMemDC = NULL;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("2x");
+FunctionHelper funcHelper("lne");
 
 void initGraph()
 {
