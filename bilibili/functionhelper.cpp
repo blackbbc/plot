@@ -1,5 +1,6 @@
 #include "functionhelper.h"
 #include "config.h"
+#include "mathparser.h"
 
 FunctionHelper::FunctionHelper (char *func)
 {
