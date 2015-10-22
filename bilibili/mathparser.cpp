@@ -2,8 +2,11 @@
 
 #define M_PI "3.14159265358979323846"
 
-std::map<std::string, int> pri;
+using namespace std;
 
+map<std::string, int> pri;
+
+//预处理算符优先级
 void initialParser()
 {
 	pri["\0"] = 0;
@@ -15,6 +18,11 @@ void initialParser()
 	pri["asin"] = 8;
 	pri["acos"] = 8;
 	pri["atan"] = 8;
+	pri["ln"] = 8;
+	pri["log"] = 8;
+	pri["exp"] = 8;
+	pri["sqrt"] = 8;
+	pri["abs"] = 8;
 	pri["^"] = 7;
 	pri["*"] = 5;
 	pri["/"] = 5;
@@ -106,13 +114,13 @@ char *getOp(const char *src, int &i)
 }
 
 //中缀转后缀
-std::queue<char *> getRPN(const char *src)
+queue<char *> getRPN(const char *src)
 {
 	int i = 0;
 	int n = strlen(src);
 	char *buffer;
-	std::stack<char *> expe;  //存储符号栈
-	std::queue<char *> rpn;   //逆波兰表达式
+	stack<char *> expe;  //存储符号栈
+	queue<char *> rpn;   //逆波兰表达式
 
 	expe.push("\0");
 	//处理表达式
@@ -180,9 +188,9 @@ std::queue<char *> getRPN(const char *src)
 }
 
 //使用后缀表达式求值
-double countexp(std::queue<char *> &rpn)
+double countexp(queue<char *> &rpn)
 {
-	std::stack<double> ans;
+	stack<double> ans;
 	char *buffer;
 	double a, b, c;
 
@@ -260,6 +268,71 @@ double countexp(std::queue<char *> &rpn)
 				a = ans.top();
 				ans.pop();
 				c = cos(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "tan") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = tan(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "asin") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = asin(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "acos") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = acos(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "atan") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = atan(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "ln") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = log(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "log") == 0)
+			{
+				b = ans.top();
+				ans.pop();
+				a = ans.top();
+				ans.pop();
+				c = log10(b) / log10(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "exp") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = exp(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "sqrt") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = sqrt(a);
+				ans.push(c);
+			}
+			else if (strcmp(buffer, "abs") == 0)
+			{
+				a = ans.top();
+				ans.pop();
+				c = abs(a);
 				ans.push(c);
 			}
 			else if (strcmp(buffer, "root") == 0)
