@@ -188,7 +188,7 @@ queue<char *> getRPN(const char *src)
 }
 
 //使用后缀表达式求值
-double countexp(queue<char *> &rpn)
+double countexp(queue<char *> &rpn, double xValue)
 {
 	stack<double> ans;
 	char *buffer;
@@ -205,7 +205,7 @@ double countexp(queue<char *> &rpn)
 		//判断是不是x
 		else if (strcmp(rpn.front(), "x") == 0)
 		{
-			ans.push(2);
+			ans.push(xValue);
 		}
 		else
 			//否则是算符
@@ -350,4 +350,11 @@ double countexp(queue<char *> &rpn)
 
 	return ans.top();
 
+}
+
+double parse(char *expression, double xValue)
+{
+	char *processed = preProcessing(expression);
+	queue<char *> rpn = getRPN(processed);
+	return countexp(rpn, xValue);
 }

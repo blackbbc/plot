@@ -40,7 +40,7 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 
 DOUBLE FunctionHelper::getY(DOUBLE x)
 {
-	return x * x;
+	return parse(_func, x);
 }
 
 void FunctionHelper::draw(HDC &hdc)
