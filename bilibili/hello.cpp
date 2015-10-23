@@ -391,7 +391,7 @@ void TrackMouse(HWND hwnd)
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
-	HCURSOR hCursHand = LoadCursor(NULL, IDC_HAND);
+	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
 	INT wheelDelta;
@@ -410,8 +410,6 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 			ORIGIN_POINT.x += pt.x - ptOld.x;
 			ORIGIN_POINT.y += pt.y - ptOld.y;
-			//MoveToEx(hdc, ptOld.x, ptOld.y, NULL);
-			//LineTo(hdc, pt.x, pt.y);
 			invalidWindow(hwnd);
 
 			ptOld = pt;
