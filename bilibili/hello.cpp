@@ -391,6 +391,7 @@ void TrackMouse(HWND hwnd)
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
+	HBITMAP hBmp;
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
@@ -402,19 +403,18 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	switch (Msg)
 	{
 	case WM_MOUSEMOVE:
-		pt = MAKEPOINTS(lParam);
-
 		if (isLButtonDown) 
 		{
+			pt = MAKEPOINTS(lParam);
 			hdc = GetDC(hwnd);
-
 			ORIGIN_POINT.x += pt.x - ptOld.x;
 			ORIGIN_POINT.y += pt.y - ptOld.y;
 			invalidWindow(hwnd);
-
 			ptOld = pt;
-
 			ReleaseDC(hwnd, hdc);
+
+			//从hMemDC中读取画布到当前画布
+			//BitBlt(hdc, pt.x - ptOld.x, pt.y - ptOld.y, WINDOW_WIDTH, WINDOW_HEIGHT, hMemDC, 0, 0, SRCERASE);
 		}
 
 		if (!Tracking)
@@ -425,17 +425,30 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
-			//do something
+			//鼠标按下
 			SetCursor(hCursHand);
 			ptOld = MAKEPOINTS(lParam);
 			OutputDebugString(L"LButtonDown\n");
+
+			//记录当前画布
+			//hdc = GetDC(hwnd);
+			//hBmp = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+			//hMemDC = CreateCompatibleDC(hdc);
+			//SelectObject(hMemDC, hBmp);
 		}
 		isLButtonDown = TRUE;
 		break;
 	case WM_LBUTTONUP:
 		if (isLButtonDown == TRUE) {
-			//do something
+			//鼠标松开
 			SetCursor(hCursArrow);
+			pt = MAKEPOINTS(lParam);
+			hdc = GetDC(hwnd);
+			ORIGIN_POINT.x += pt.x - ptOld.x;
+			ORIGIN_POINT.y += pt.y - ptOld.y;
+			invalidWindow(hwnd);
+			ptOld = pt;
+			ReleaseDC(hwnd, hdc);
 			OutputDebugString(L"LButtonUp\n");
 		}
 		isLButtonDown = FALSE;
@@ -443,8 +456,15 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSELEAVE:
 		Tracking = FALSE;
 		if (isLButtonDown == TRUE) {
-			//do something
+			//鼠标离开窗口
 			SetCursor(hCursArrow);
+			pt = MAKEPOINTS(lParam);
+			hdc = GetDC(hwnd);
+			ORIGIN_POINT.x += pt.x - ptOld.x;
+			ORIGIN_POINT.y += pt.y - ptOld.y;
+			invalidWindow(hwnd);
+			ptOld = pt;
+			ReleaseDC(hwnd, hdc);
 			OutputDebugString(L"MouseLeave\n");
 		}
 		isLButtonDown = FALSE;
