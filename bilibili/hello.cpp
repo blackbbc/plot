@@ -85,7 +85,11 @@ void drawCoordinate(HDC &hdc)
 
 wchar_t *getFormat()
 {
-	if (RATIO >= 0.01 && RATIO < 0.1)
+	if (RATIO >= 0.001 && RATIO < 0.01)
+	{
+		return L"%.3f";
+	}
+	else if (RATIO >= 0.01 && RATIO < 0.1)
 	{
 		return L"%.2f";
 	}
@@ -310,7 +314,6 @@ void zoom(INT wheelDelta)
 {
 	DOUBLE xDelta, yDelta, zDelta;
 	INT zoomCoefficient = 10;
-
 
 	std::wstring msg;
 	msg = std::to_wstring(pt.x);
@@ -548,6 +551,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		if (isLButtonDown) 
 		{
 			pt = MAKEPOINTS(lParam);
+
 			hdc = GetDC(hwnd);
 			ORIGIN_POINT.x += pt.x - ptOld.x;
 			ORIGIN_POINT.y += pt.y - ptOld.y;
@@ -592,6 +596,22 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		//OutputDebugString(msg.c_str());
 		if (wheelDelta != 0)
 		{
+			pt = MAKEPOINTS(lParam);
+			POINT temp;
+			temp.x = pt.x;
+			temp.y = pt.y;
+			ScreenToClient(hwnd, &temp);
+			pt.x = temp.x;
+			pt.y = temp.y;
+
+			std::wstring msg;
+			msg = std::to_wstring(pt.x);
+			OutputDebugString(msg.c_str());
+			OutputDebugString(L"\n");
+			msg = std::to_wstring(pt.y);
+			OutputDebugString(msg.c_str());
+			OutputDebugString(L"\n");
+
 			zoom(wheelDelta);
 			invalidWindow(hwnd);
 		}
