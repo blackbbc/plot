@@ -15,7 +15,7 @@ HDC hMemDC = NULL;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("x*sin(x)");
+FunctionHelper funcHelper("lnx");
 
 void initGraph()
 {
@@ -384,6 +384,7 @@ int CaptureAnImage(HWND hWnd)
 	HDC hdcScreen;
 	HDC hdcWindow;
 	HDC hdcMemDC = NULL;
+	HDC copyDC;
 	HBITMAP hbmScreen = NULL;
 	BITMAP bmpScreen;
 
@@ -394,6 +395,7 @@ int CaptureAnImage(HWND hWnd)
 
 	// Create a compatible DC which is used in a BitBlt from the window DC
 	hdcMemDC = CreateCompatibleDC(hdcWindow);
+	copyDC = CreateCompatibleDC(hdcWindow);
 
 	if (!hdcMemDC)
 	{
@@ -405,21 +407,18 @@ int CaptureAnImage(HWND hWnd)
 	RECT rcClient;
 	GetClientRect(hWnd, &rcClient);
 
-	//This is the best stretch mode
-	SetStretchBltMode(hdcWindow, HALFTONE);
-
-	FillRect(hdcWindow, &rcClient, (HBRUSH)(COLOR_WINDOW));
+	//FillRect(hdcWindow, &rcClient, (HBRUSH)(COLOR_WINDOW));
 	//The source DC is the entire screen and the destination DC is the current window (HWND)
-	if (!StretchBlt(hdcWindow,
-		100, 100,
-		rcClient.right, rcClient.bottom,
-		hdcScreen,
-		0, 0,
-		GetSystemMetrics(SM_CXSCREEN),
-		GetSystemMetrics(SM_CYSCREEN),
+
+	if (!BitBlt(
+		hdcWindow, 
+		100, 100, 
+		WINDOW_WIDTH, WINDOW_HEIGHT, 
+		hdcMemDC, 
+		0, 0, 
 		SRCCOPY))
 	{
-		MessageBox(hWnd, L"StretchBlt has failed", L"Failed", MB_OK);
+		MessageBox(hWnd, L"BitBlt has failed", L"Failed", MB_OK);
 		goto done;
 	}
 
