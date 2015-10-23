@@ -311,6 +311,7 @@ void zoom(INT wheelDelta)
 	DOUBLE xDelta, yDelta, zDelta;
 	INT zoomCoefficient = 10;
 
+
 	std::wstring msg;
 	msg = std::to_wstring(pt.x);
 	OutputDebugString(msg.c_str());
@@ -378,6 +379,15 @@ void zoom(INT wheelDelta)
 	}
 }
 
+void TrackMouse(HWND hwnd)
+{
+	TRACKMOUSEEVENT tme;
+	tme.cbSize = sizeof(TRACKMOUSEEVENT);
+	tme.dwFlags = TME_LEAVE; //Type of events to track & trigger.
+	tme.hwndTrack = hwnd;
+	TrackMouseEvent(&tme);
+}
+
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HDC hdc;
@@ -386,6 +396,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	INT wheelDelta;
 	std::wstring msg;
+
+	static bool Tracking = FALSE;
 
 	switch (Msg)
 	{
@@ -406,6 +418,12 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 			ReleaseDC(hwnd, hdc);
 		}
+
+		if (!Tracking)
+		{
+			TrackMouse(hwnd);
+			Tracking = true;
+		}
 		break;
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
@@ -424,12 +442,23 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		}
 		isLButtonDown = FALSE;
 		break;
+	case WM_MOUSELEAVE:
+		Tracking = FALSE;
+		if (isLButtonDown == TRUE) {
+			//do something
+			SetCursor(hCursArrow);
+			OutputDebugString(L"MouseLeave\n");
+		}
+		isLButtonDown = FALSE;
 	case WM_MOUSEWHEEL:
 		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
 		msg = std::to_wstring(wheelDelta);
 		//OutputDebugString(msg.c_str());
-		zoom(wheelDelta);
-		invalidWindow(hwnd);
+		if (wheelDelta != 0)
+		{
+			zoom(wheelDelta);
+			invalidWindow(hwnd);
+		}
 		break;
 	case WM_PAINT:
 		PAINTSTRUCT ps;
