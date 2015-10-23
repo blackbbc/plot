@@ -15,7 +15,7 @@ HDC hMemDC = NULL;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("lnx");
+FunctionHelper funcHelper("x*sin(x)");
 
 void initGraph()
 {
