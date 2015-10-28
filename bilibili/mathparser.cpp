@@ -160,7 +160,7 @@ Token getTokenFromExpe(char *buffer)
 	}
 	else if (strcmp(buffer, "/") == 0)
 	{
-		return Token{ 3, 0, NULL, mysub };
+		return Token{ 3, 0, NULL, mydiv };
 	}
 	else if (strcmp(buffer, "^") == 0)
 	{

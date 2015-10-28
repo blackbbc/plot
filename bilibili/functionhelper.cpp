@@ -55,7 +55,7 @@ void FunctionHelper::draw(HDC &hdc)
 	for (INT i = 0; i < xVec.size(); i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
-		if (isnan(yVec[i]) || abs(yVec[i]) > DBL_MAX)
+		if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
 		{
 			isFirst = TRUE;
 			continue;
