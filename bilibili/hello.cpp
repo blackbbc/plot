@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <string>
 #include <cmath>
+#include <chrono>
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
@@ -15,7 +16,7 @@ HDC hMemDC = NULL;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("lnx");
+FunctionHelper funcHelper("1/x");
 
 void initGraph()
 {
@@ -295,7 +296,15 @@ void drawFunction(HDC &hdc)
 	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 136, 255));
 	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
 
+
+	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	funcHelper.draw(hdc);
+	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+
+	std::wstring msg;
+	msg = std::to_wstring(duration);
+	OutputDebugString(msg.c_str());
 
 	SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
