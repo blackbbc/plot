@@ -42,8 +42,7 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 
 DOUBLE FunctionHelper::getY(DOUBLE x)
 {
-	std::queue<char *> rpn = std::queue<char *>(_rpn);
-	return countexp(rpn, x);
+	return countexp(this->_rpn, x);
 }
 
 void FunctionHelper::draw(HDC &hdc)

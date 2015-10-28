@@ -1,8 +1,8 @@
 ﻿#include "mathparser.h"
 #include "config.h"
 
-#define M_PI "3.14159265358979323846"
-#define M_E  "2.71828182845904523536"
+#define M_PI 3.14159265358979323846
+#define M_E  2.71828182845904523536
 
 using namespace std;
 
@@ -112,14 +112,118 @@ char *getOp(const char *src, int &i)
 	return op;
 }
 
+double myadd(double a, double b)
+{
+	return a + b;
+}
+
+double mysub(double a, double b)
+{
+	return a - b;
+}
+
+double mymul(double a, double b)
+{
+	return a * b;
+}
+
+double mydiv(double a, double b)
+{
+	return a / b;
+}
+
+
+double mylog(double a, double b)
+{
+	return log10(b) / log10(a);
+}
+
+double myroot(double a, double b)
+{
+	return pow(a, 1 / b);
+}
+
+Token getTokenFromExpe(char *buffer)
+{
+	double a, b, c;
+	if (strcmp(buffer, "+") == 0)
+	{
+		return Token{ 3, 0, NULL, myadd };
+	}
+	else if (strcmp(buffer, "-") == 0)
+	{
+		return Token{ 3, 0, NULL, mysub };
+	}
+	else if (strcmp(buffer, "*") == 0)
+	{
+		return Token{ 3, 0, NULL, mymul };
+	}
+	else if (strcmp(buffer, "/") == 0)
+	{
+		return Token{ 3, 0, NULL, mysub };
+	}
+	else if (strcmp(buffer, "^") == 0)
+	{
+		return Token{ 3, 0, NULL, pow };
+	}
+	else if (strcmp(buffer, "sin") == 0)
+	{
+		return Token{ 2, 0, sin, NULL };
+	}
+	else if (strcmp(buffer, "cos") == 0)
+	{
+		return Token{ 2, 0, cos, NULL };
+	}
+	else if (strcmp(buffer, "tan") == 0)
+	{
+		return Token{ 2, 0, tan, NULL };
+	}
+	else if (strcmp(buffer, "asin") == 0)
+	{
+		return Token{ 2, 0, asin, NULL };
+	}
+	else if (strcmp(buffer, "acos") == 0)
+	{
+		return Token{ 2, 0, acos, NULL };
+	}
+	else if (strcmp(buffer, "atan") == 0)
+	{
+		return Token{ 2, 0, atan, NULL };
+	}
+	else if (strcmp(buffer, "ln") == 0)
+	{
+		return Token{ 2, 0, log, NULL };
+	}
+	else if (strcmp(buffer, "log") == 0)
+	{
+		return Token{ 3, 0, NULL, mylog };
+	}
+	else if (strcmp(buffer, "sqrt") == 0)
+	{
+		return Token{ 2, 0, sqrt, NULL };
+	}
+	else if (strcmp(buffer, "abs") == 0)
+	{
+		return Token{ 2, 0, abs, NULL };
+	}
+	else if (strcmp(buffer, "root") == 0)
+	{
+		return Token{ 3, 0, NULL, myroot };
+	}
+	else
+	{
+		return Token{ -1, 0, NULL, NULL };
+	}
+}
+
 //中缀转后缀
-queue<char *> getRPN(const char *src)
+vector<Token> getRPN(const char *src)
 {
 	int i = 0;
 	int n = strlen(src);
 	char *buffer;
 	stack<char *> expe;  //存储符号栈
-	queue<char *> rpn;   //逆波兰表达式
+	vector<Token> rpn;   //逆波兰表达式
 
 	expe.push("\0");
 	//处理表达式
@@ -129,22 +233,22 @@ queue<char *> getRPN(const char *src)
 		if (isdigit(src[i]))
 		{
 			buffer = getNumber(src, i);
-			rpn.push(buffer);
+			rpn.push_back(Token{0, atof(src), NULL, NULL});
 		}
 		else if (src[i] == 'x')
 		{
 			i++;
-			rpn.push("x");
+			rpn.push_back(Token{1, 0, NULL, NULL});
 		}
 		else if (src[i] == 'p' && src[i + 1] == 'i')
 		{
 			i += 2;
-			rpn.push(M_PI);
+			rpn.push_back(Token{ 0, M_PI, NULL, NULL });
 		}
 		else if (src[i] == 'e')
 		{
 			i++;
-			rpn.push(M_E);
+			rpn.push_back(Token{ 0, M_E, NULL, NULL });
 		}
 		else
 		{
@@ -164,7 +268,7 @@ queue<char *> getRPN(const char *src)
 			{
 				while (strcmp(expe.top(), "(") != 0)
 				{
-					rpn.push(expe.top());
+					rpn.push_back(getTokenFromExpe(expe.top()));
 					expe.pop();
 				}
 
@@ -180,7 +284,7 @@ queue<char *> getRPN(const char *src)
 				//如果非空且栈顶元素优先级大于当前符号，出栈
 				while ((!expe.empty()) && (pri[expe.top()] >= pri[buffer]))
 				{
-					rpn.push(expe.top());
+					rpn.push_back(getTokenFromExpe(expe.top()));
 					expe.pop();
 				}
 				//插入当前算符
@@ -192,11 +296,11 @@ queue<char *> getRPN(const char *src)
 }
 
 //使用后缀表达式求值
-double countexp(queue<char *> &rpn, double xValue)
+double countexp(vector<Token> &rpn, double xValue)
 {
 	stack<double> ans;
-	char *buffer;
 	double a, b, c;
+	Token token;
 
 	/*
 	token
@@ -206,151 +310,32 @@ double countexp(queue<char *> &rpn, double xValue)
 	3 2元算符
 	*/
 
-	while (!rpn.empty())
+	for (int i = 0; i < rpn.size() - 1; i++)
 	{
-		//判断是不是数字
-		if (isdigit(rpn.front()[0]))
+		token = rpn[i];
+		switch (token.iden)
 		{
-			c = atof(rpn.front());
-			ans.push(c);
-		}
-		//判断是不是x
-		else if (strcmp(rpn.front(), "x") == 0)
-		{
+		case 0:
+			ans.push(token.number);
+			break;
+		case 1:
 			ans.push(xValue);
+			break;
+		case 2:
+			a = ans.top();
+			ans.pop();
+			c = token.callOneArg(a);
+			ans.push(c);
+			break;
+		case 3:
+			b = ans.top();
+			ans.pop();
+			a = ans.top();
+			ans.pop();
+			c = token.callTwoArg(a, b);
+			ans.push(c);
+			break;
 		}
-		else
-			//否则是算符
-		{
-			buffer = rpn.front();
-			if (strcmp(buffer, "+") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = a + b;
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "-") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = a - b;
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "*") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = a * b;
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "/") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = a / b;
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "^") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = pow(a, b);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "sin") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = sin(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "cos") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = cos(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "tan") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = tan(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "asin") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = asin(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "acos") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = acos(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "atan") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = atan(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "ln") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = log(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "log") == 0)
-			{
-				b = ans.top();
-				ans.pop();
-				a = ans.top();
-				ans.pop();
-				c = log10(b) / log10(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "sqrt") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = sqrt(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "abs") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				c = abs(a);
-				ans.push(c);
-			}
-			else if (strcmp(buffer, "root") == 0)
-			{
-				a = ans.top();
-				ans.pop();
-				b = ans.top();
-				ans.pop();
-				ans.push(pow(a, 1 / b));
-			}
-		}
-
-		rpn.pop();
 	}
 
 	return ans.top();

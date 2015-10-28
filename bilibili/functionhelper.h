@@ -3,12 +3,13 @@
 #include <Windows.h>
 #include <vector>
 #include <queue>
+#include "mathparser.h"
 
 class FunctionHelper
 {
 private:
 	char *_func;
-	std::queue<char *> _rpn;
+	std::vector<Token> _rpn;
 public:
 	FunctionHelper::FunctionHelper(char *func);
 

@@ -20,6 +20,13 @@ struct Token
 	CallTwoArg callTwoArg;
 };
 
+double myadd(double a, double b);
+double mysub(double a, double b);
+double mymul(double a, double b);
+double mydiv(double a, double b);
+double mylog(double a, double b);
+double myroot(double a, double b);
+
 void initialParser();
 
 char *preProcessing(char *src);
@@ -28,6 +35,6 @@ char *getNumber(const char *src, int &i);
 
 char *getOp(const char *src, int &i);
 
-std::queue<char *> getRPN(const char *src);
+std::vector<Token> getRPN(const char *src);
 
-double countexp(std::queue<char *> &rpn, double xValue);
+double countexp(std::vector<Token> &rpn, double xValue);
