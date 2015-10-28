@@ -198,6 +198,14 @@ double countexp(queue<char *> &rpn, double xValue)
 	char *buffer;
 	double a, b, c;
 
+	/*
+	token
+	0 数字
+	1 x
+	2 1元算符
+	3 2元算符
+	*/
+
 	while (!rpn.empty())
 	{
 		//判断是不是数字
@@ -239,7 +247,7 @@ double countexp(queue<char *> &rpn, double xValue)
 				ans.pop();
 				a = ans.top();
 				ans.pop();
-				c = a*b;
+				c = a * b;
 				ans.push(c);
 			}
 			else if (strcmp(buffer, "/") == 0)
