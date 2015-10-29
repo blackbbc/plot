@@ -14,5 +14,5 @@ void invalidWindow(HWND &hwnd)
 {
 	LPRECT clientRect = {};
 	GetClientRect(hwnd, clientRect);
-	InvalidateRect(hwnd, clientRect, TRUE);
+	InvalidateRect(hwnd, clientRect, FALSE);
 }
