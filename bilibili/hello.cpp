@@ -12,7 +12,16 @@
 
 POINTS pt;
 POINTS ptOld;
+
+HDC hdc = NULL;
 HDC hMemDC = NULL;
+HBITMAP hMemBM = NULL;
+PAINTSTRUCT ps;
+
+HPEN hpen;
+HPEN hpenOld;
+
+HANDLE hOld;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
@@ -70,17 +79,17 @@ void initGraph()
 
 }
 
-void drawCoordinate(HDC &hdc)
+void drawCoordinate()
 {
-	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
+	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
-	MoveToEx(hdc, 0, ORIGIN_POINT.y, NULL);
-	LineTo(hdc, WINDOW_WIDTH, ORIGIN_POINT.y);
-	MoveToEx(hdc, ORIGIN_POINT.x, 0, NULL);
-	LineTo(hdc, ORIGIN_POINT.x, WINDOW_HEIGHT);
+	MoveToEx(hMemDC, 0, ORIGIN_POINT.y, NULL);
+	LineTo(hMemDC, WINDOW_WIDTH, ORIGIN_POINT.y);
+	MoveToEx(hMemDC, ORIGIN_POINT.x, 0, NULL);
+	LineTo(hMemDC, ORIGIN_POINT.x, WINDOW_HEIGHT);
 
-	SelectObject(hdc, hpenOld);
+	SelectObject(hMemDC, hpenOld);
 	DeleteObject(hpen);
 }
 
@@ -104,201 +113,205 @@ wchar_t *getFormat()
 	}
 }
 
-void drawTick(HDC &hdc)
+void drawTick()
 {
-	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
-	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
+	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
 	INT tick = 0;
+	DOUBLE i, percent;
 	wchar_t buffer[100];
 	std::wstring tickNumber;
-	for (DOUBLE i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+
+	for (i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	for (i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	for (i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE temp = getYRangeLength();
-		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			MoveToEx(hdc, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hdc, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hdc, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
 		}
 	}
 
-	SelectObject(hdc, hpenOld);
+	SelectObject(hMemDC, hpenOld);
 	DeleteObject(hpen);
 }
 
-void drawGrid(HDC &hdc)
+HPEN gridPen;
+HPEN gridBoldPen;
+
+void drawGrid()
 {
+	DOUBLE i, percent;
 	if (!SHOW_GRID)
 		return;
 
-	HPEN gridPen = CreatePen(PS_SOLID, 2, RGB(192, 192, 192));
-	HPEN gridBoldPen = CreatePen(PS_SOLID, 2, RGB(153, 153, 153));
-	HPEN hpenOld = (HPEN)SelectObject(hdc, gridPen);
+	gridPen = CreatePen(PS_SOLID, 2, RGB(192, 192, 192));
+	gridBoldPen = CreatePen(PS_SOLID, 2, RGB(153, 153, 153));
+	hpenOld = (HPEN)SelectObject(hMemDC, gridPen);
 
 	INT tick = 0;
 	std::wstring tickNumber;
-	for (DOUBLE i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
+	for (i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			SelectObject(hdc, gridBoldPen);
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			SelectObject(hMemDC, gridBoldPen);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 		else
 		{
-			SelectObject(hdc, gridPen);
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			SelectObject(hMemDC, gridPen);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
+	for (i = -X_TICK_DISTANCE; i > X_RANGE_LEFT; i -= X_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - X_RANGE_LEFT) / getXRangeLength();
+		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % 5 == 0)
 		{
-			SelectObject(hdc, gridBoldPen);
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			SelectObject(hMemDC, gridBoldPen);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 		else
 		{
-			SelectObject(hdc, gridPen);
-			MoveToEx(hdc, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hdc, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			SelectObject(hMemDC, gridPen);
+			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
+	for (i = Y_TICK_DISTANCE; i < Y_RANGE_RIGHT; i += Y_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			SelectObject(hdc, gridBoldPen);
-			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			SelectObject(hMemDC, gridBoldPen);
+			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 		else
 		{
-			SelectObject(hdc, gridPen);
-			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			SelectObject(hMemDC, gridPen);
+			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 	}
 
 	tick = 0;
-	for (DOUBLE i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
+	for (i = -Y_TICK_DISTANCE; i > Y_RANGE_LEFT; i -= Y_TICK_DISTANCE)
 	{
 		tick++;
-		DOUBLE percent = (i - Y_RANGE_LEFT) / getYRangeLength();
+		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
 		if (tick % 5 == 0)
 		{
-			SelectObject(hdc, gridBoldPen);
-			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			SelectObject(hMemDC, gridBoldPen);
+			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 		else
 		{
-			SelectObject(hdc, gridPen);
-			MoveToEx(hdc, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hdc, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			SelectObject(hMemDC, gridPen);
+			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
+			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
 		}
 	}
 
-	SelectObject(hdc, hpenOld);
+	SelectObject(hMemDC, hpenOld);
 	DeleteObject(gridPen);
 	DeleteObject(gridBoldPen);
 }
 
-void drawFunction(HDC &hdc)
+void drawFunction()
 {
-	HPEN hpen = CreatePen(PS_SOLID, 2, RGB(0, 136, 255));
-	HPEN hpenOld = (HPEN)SelectObject(hdc, hpen);
-
+	hpen = CreatePen(PS_SOLID, 2, RGB(0, 136, 255));
+	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-	funcHelper.draw(hdc);
+	funcHelper.draw(hMemDC);
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
@@ -306,17 +319,17 @@ void drawFunction(HDC &hdc)
 	msg = std::to_wstring(duration);
 	OutputDebugString(msg.c_str());
 
-	SelectObject(hdc, hpenOld);
+	SelectObject(hMemDC, hpenOld);
 	DeleteObject(hpen);
 }
 
-void onPaint(HDC &hdc) 
+void onPaint() 
 {
 	initGraph();
-	drawGrid(hdc);
-	drawCoordinate(hdc);
-	drawTick(hdc);
-	drawFunction(hdc);
+	drawGrid();
+	drawCoordinate();
+	drawTick();
+	drawFunction();
 }
 
 void zoom(INT wheelDelta)
@@ -544,8 +557,6 @@ void TrackMouse(HWND hwnd)
 
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	HDC hdc;
-	HBITMAP hBmp;
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
@@ -561,12 +572,10 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			pt = MAKEPOINTS(lParam);
 
-			hdc = GetDC(hwnd);
 			ORIGIN_POINT.x += pt.x - ptOld.x;
 			ORIGIN_POINT.y += pt.y - ptOld.y;
 			invalidWindow(hwnd);
 			ptOld = pt;
-			ReleaseDC(hwnd, hdc);
 		}
 		if (!Tracking)
 		{
@@ -601,7 +610,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 	case WM_MOUSEWHEEL:
 		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-		msg = std::to_wstring(wheelDelta);
+		//msg = std::to_wstring(wheelDelta);
 		//OutputDebugString(msg.c_str());
 		if (wheelDelta != 0)
 		{
@@ -614,12 +623,12 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.y = temp.y;
 
 			std::wstring msg;
-			msg = std::to_wstring(pt.x);
-			OutputDebugString(msg.c_str());
-			OutputDebugString(L"\n");
-			msg = std::to_wstring(pt.y);
-			OutputDebugString(msg.c_str());
-			OutputDebugString(L"\n");
+			//msg = std::to_wstring(pt.x);
+			//OutputDebugString(msg.c_str());
+			//OutputDebugString(L"\n");
+			//msg = std::to_wstring(pt.y);
+			//OutputDebugString(msg.c_str());
+			//OutputDebugString(L"\n");
 
 			zoom(wheelDelta);
 			invalidWindow(hwnd);
@@ -629,17 +638,34 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		CaptureAnImage(hwnd);
 		break;
 	case WM_PAINT:
-		PAINTSTRUCT ps;
+		//Ë«»º³å»æÍ¼
+
 		hdc = BeginPaint(hwnd, &ps);
-		onPaint(hdc);
+
+		hMemDC = CreateCompatibleDC(hdc);
+		hMemBM = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+		hOld = SelectObject(hMemDC, hMemBM);
+
+
+		RECT rcClient;
+		GetClientRect(hwnd, &rcClient);
+		FillRect(hMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
+
+		onPaint();
+		BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+
+		SelectObject(hMemDC, hOld);
+		DeleteObject(hMemBM);
+		DeleteDC(hMemDC);
+
 		EndPaint(hwnd, &ps);
 		break;
 	case WM_SIZE:
 		WINDOW_WIDTH = LOWORD(lParam);
 		WINDOW_HEIGHT = HIWORD(lParam);
-		invalidWindow(hwnd);
-		OutputDebugString(L"On Size\n");
 		break;
+	case WM_ERASEBKGND:
+		return 1;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;

@@ -295,10 +295,13 @@ vector<Token> getRPN(const char *src)
 	return rpn;
 }
 
+double ans[1000];
+
 //使用后缀表达式求值
 double countexp(vector<Token> &rpn, double xValue)
 {
-	stack<double> ans;
+	//stack<double> ans;
+	int i, top = 0;
 	double a, b, c;
 	Token token;
 
@@ -310,34 +313,28 @@ double countexp(vector<Token> &rpn, double xValue)
 	3 2元算符
 	*/
 
-	for (int i = 0; i < rpn.size() - 1; i++)
+	for (i = 0; i < rpn.size() - 1; i++)
 	{
 		token = rpn[i];
 		switch (token.iden)
 		{
 		case 0:
-			ans.push(token.number);
+			ans[top] = token.number;
+			top++;
 			break;
 		case 1:
-			ans.push(xValue);
+			ans[top] = xValue;
+			top++;
 			break;
 		case 2:
-			a = ans.top();
-			ans.pop();
-			c = token.callOneArg(a);
-			ans.push(c);
+			ans[top - 1] = token.callOneArg(ans[top - 1]);
 			break;
 		case 3:
-			b = ans.top();
-			ans.pop();
-			a = ans.top();
-			ans.pop();
-			c = token.callTwoArg(a, b);
-			ans.push(c);
+			ans[top - 2] = token.callTwoArg(ans[top - 2], ans[top - 1]);
 			break;
 		}
 	}
 
-	return ans.top();
+	return ans[0];
 
 }
