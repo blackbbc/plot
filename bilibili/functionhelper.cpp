@@ -13,9 +13,9 @@ std::vector<DOUBLE> FunctionHelper::getXVec()
 {
 	std::vector<DOUBLE> temp;
 
-	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH / 2;
+	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH;
 
-	for (INT i = 0; i < 2 * WINDOW_WIDTH; i++)
+	for (INT i = 0; i < WINDOW_WIDTH; i++)
 	{
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
 		temp.push_back(x);
@@ -29,9 +29,9 @@ std::vector<DOUBLE> FunctionHelper::getYVec()
 {
 	std::vector<DOUBLE> temp;
 
-	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH / 2;
+	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH;
 
-	for (INT i = 0; i < 2 * WINDOW_WIDTH; i++)
+	for (INT i = 0; i < WINDOW_WIDTH; i++)
 	{
 		DOUBLE x = X_RANGE_LEFT + gapX * i;
 		DOUBLE y = getY(x);
@@ -47,12 +47,17 @@ DOUBLE FunctionHelper::getY(DOUBLE x)
 
 void FunctionHelper::draw(HDC &hdc)
 {
+	BOOL isFirst = TRUE;
+	DOUBLE percentX, percentY;
+	INT i;
+
+	DOUBLE XLength = getXRangeLength();
+	DOUBLE YLength = getYRangeLength();
+
 	std::vector<DOUBLE> xVec = getXVec();
 	std::vector<DOUBLE> yVec = getYVec();
 
-	BOOL isFirst = TRUE;
-
-	for (INT i = 0; i < xVec.size(); i++)
+	for (i = 0; i < xVec.size(); i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
 		if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
@@ -61,8 +66,8 @@ void FunctionHelper::draw(HDC &hdc)
 			continue;
 		}
 
-		DOUBLE percentX = (xVec[i] - X_RANGE_LEFT) / getXRangeLength();
-		DOUBLE percentY = (yVec[i] - Y_RANGE_LEFT) / getYRangeLength();
+		percentX = (xVec[i] - X_RANGE_LEFT) / XLength;
+		percentY = (yVec[i] - Y_RANGE_LEFT) / YLength;
 		percentY = 1 - percentY;
 		if (isFirst == TRUE)
 		{

@@ -300,9 +300,7 @@ double ans[1000];
 //使用后缀表达式求值
 double countexp(vector<Token> &rpn, double xValue)
 {
-	//stack<double> ans;
 	int i, top = 0;
-	double a, b, c;
 	Token token;
 
 	/*

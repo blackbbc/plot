@@ -25,7 +25,7 @@ HANDLE hOld;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("1/x");
+FunctionHelper funcHelper("sin(x)");
 
 void initGraph()
 {
