@@ -233,7 +233,7 @@ vector<Token> getRPN(const char *src)
 		if (isdigit(src[i]))
 		{
 			buffer = getNumber(src, i);
-			rpn.push_back(Token{0, atof(src), NULL, NULL});
+			rpn.push_back(Token{0, atof(buffer), NULL, NULL});
 		}
 		else if (src[i] == 'x')
 		{

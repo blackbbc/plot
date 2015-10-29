@@ -25,7 +25,7 @@ HANDLE hOld;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("sin(x)");
+FunctionHelper funcHelper("x^2");
 
 void initGraph()
 {
@@ -337,13 +337,13 @@ void zoom(INT wheelDelta)
 	DOUBLE xDelta, yDelta, zDelta;
 	INT zoomCoefficient = 10;
 
-	std::wstring msg;
-	msg = std::to_wstring(pt.x);
-	OutputDebugString(msg.c_str());
-	OutputDebugString(L"\n");
-	msg = std::to_wstring(pt.y);
-	OutputDebugString(msg.c_str());
-	OutputDebugString(L"\n");
+	//std::wstring msg;
+	//msg = std::to_wstring(pt.x);
+	//OutputDebugString(msg.c_str());
+	//OutputDebugString(L"\n");
+	//msg = std::to_wstring(pt.y);
+	//OutputDebugString(msg.c_str());
+	//OutputDebugString(L"\n");
 	
 	//以45°进行缩放
 	xDelta = ORIGIN_POINT.x - pt.x;
@@ -352,6 +352,11 @@ void zoom(INT wheelDelta)
 	yDelta = yDelta / abs(yDelta);
 
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
+
+	//for (int i = 0; i < 100; i++)
+	//{
+
+	//}
 
 	if (wheelDelta > 0)
 	{
@@ -622,7 +627,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.x = temp.x;
 			pt.y = temp.y;
 
-			std::wstring msg;
+			//std::wstring msg;
 			//msg = std::to_wstring(pt.x);
 			//OutputDebugString(msg.c_str());
 			//OutputDebugString(L"\n");
