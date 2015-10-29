@@ -10,12 +10,13 @@ class FunctionHelper
 private:
 	char *_func;
 	std::vector<Token> _rpn;
+	double xVec[3000];
+	double yVec[3000];
 public:
 	FunctionHelper::FunctionHelper(char *func);
 
-	std::vector<DOUBLE> getXVec();
-	
-	std::vector<DOUBLE> getYVec();
+	void updateXVec();
+	void updateYVec();
 
 	DOUBLE getY(DOUBLE x);
 

@@ -9,35 +9,25 @@ FunctionHelper::FunctionHelper (char *func)
 	this->_rpn = getRPN(this->_func);
 }
 
-std::vector<DOUBLE> FunctionHelper::getXVec()
+void FunctionHelper::updateXVec()
 {
-	std::vector<DOUBLE> temp;
-
+	INT i;
 	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH;
 
-	for (INT i = 0; i < WINDOW_WIDTH; i++)
+	for (i = 0; i < WINDOW_WIDTH; i++)
 	{
-		DOUBLE x = X_RANGE_LEFT + gapX * i;
-		temp.push_back(x);
+		xVec[i] = X_RANGE_LEFT + gapX * i;
 	}
-
-	return temp;
 
 }
 
-std::vector<DOUBLE> FunctionHelper::getYVec()
+void FunctionHelper::updateYVec()
 {
-	std::vector<DOUBLE> temp;
-
-	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH;
-
-	for (INT i = 0; i < WINDOW_WIDTH; i++)
+	INT i;
+	for (i = 0; i < WINDOW_WIDTH; i++)
 	{
-		DOUBLE x = X_RANGE_LEFT + gapX * i;
-		DOUBLE y = getY(x);
-		temp.push_back(y);
+		yVec[i] = getY(xVec[i]);
 	}
-	return temp;
 }
 
 DOUBLE FunctionHelper::getY(DOUBLE x)
@@ -54,10 +44,10 @@ void FunctionHelper::draw(HDC &hdc)
 	DOUBLE XLength = getXRangeLength();
 	DOUBLE YLength = getYRangeLength();
 
-	std::vector<DOUBLE> xVec = getXVec();
-	std::vector<DOUBLE> yVec = getYVec();
+	updateXVec();
+	updateYVec();
 
-	for (i = 0; i < xVec.size(); i++)
+	for (i = 0; i < WINDOW_WIDTH; i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
 		if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
