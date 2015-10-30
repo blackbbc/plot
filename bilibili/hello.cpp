@@ -130,6 +130,8 @@ void drawTick()
 	wchar_t buffer[100];
 	std::wstring tickNumber;
 
+	SetBkMode(hMemDC, TRANSPARENT);
+
 	for (i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
