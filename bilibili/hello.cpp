@@ -11,6 +11,8 @@
 #include "functionhelper.h"
 #include "DebugOut.h"
 
+#define EASEOUTCUBIC(x) ((x-1)*(x-1)*(x-1))
+
 POINTS pt;
 POINTS ptOld;
 
@@ -142,7 +144,7 @@ void drawTick()
 			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, WINDOW_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -162,7 +164,7 @@ void drawTick()
 			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, WINDOW_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -183,7 +185,7 @@ void drawTick()
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -204,7 +206,7 @@ void drawTick()
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -339,11 +341,6 @@ void onPaint()
 	drawFunction();
 }
 
-void updateProperPixel()
-{
-	//To do
-}
-
 void setXRange(DOUBLE left, DOUBLE right)
 {
 	X_RANGE_LEFT = left;
@@ -364,10 +361,8 @@ void zoom(INT wheelDelta)
 	//以45°进行缩放
 	xDelta = ORIGIN_POINT.x - pt.x;
 	xDelta = xDelta == 0 ? 0 : xDelta > 0 ? 1 : -1;
-	//xDelta = xDelta / abs(xDelta);
 	yDelta = ORIGIN_POINT.y - pt.y;
 	yDelta = yDelta == 0 ? 0 : yDelta > 0 ? 1 : -1;
-	//yDelta = yDelta / abs(yDelta);
 
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
@@ -406,6 +401,10 @@ void zoom(INT wheelDelta)
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
 		}
 
+		X_RANGE_LEFT *= 2;
+		X_RANGE_RIGHT *= 2;
+		Y_RANGE_LEFT *= 2;
+		Y_RANGE_RIGHT *= 2;
 		PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
 		if (PIXEL_ROUND == 0)
 		{
@@ -639,16 +638,12 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.x = temp.x;
 			pt.y = temp.y;
 
-			//SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
-
-			DebugOut() << wheelDelta;
-
 			zoom(wheelDelta);
 			invalidWindow(hwnd);
 		}
 		break;
 	case WM_RBUTTONDOWN:
-		setXRange(-100, 100);
+		//setXRange(-100, 100);
 		invalidWindow(hwnd);
 		//SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
 		//CaptureAnImage(hwnd);
