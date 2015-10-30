@@ -324,9 +324,7 @@ void drawFunction()
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
-	std::wstring msg;
-	msg = std::to_wstring(duration);
-	OutputDebugString(msg.c_str());
+	//DebugOut() << duration;
 
 	SelectObject(hMemDC, hpenOld);
 	DeleteObject(hpen);
@@ -341,24 +339,35 @@ void onPaint()
 	drawFunction();
 }
 
+void updateProperPixel()
+{
+	//To do
+}
+
+void setXRange(DOUBLE left, DOUBLE right)
+{
+	X_RANGE_LEFT = left;
+	X_RANGE_RIGHT = right;
+}
+
+void setYRange(DOUBLE left, DOUBLE right)
+{
+	Y_RANGE_LEFT = left;
+	Y_RANGE_RIGHT = right;
+}
+
 void zoom(INT wheelDelta)
 {
 	DOUBLE xDelta, yDelta, zDelta;
 	INT zoomCoefficient = 10;
 
-	//std::wstring msg;
-	//msg = std::to_wstring(pt.x);
-	//OutputDebugString(msg.c_str());
-	//OutputDebugString(L"\n");
-	//msg = std::to_wstring(pt.y);
-	//OutputDebugString(msg.c_str());
-	//OutputDebugString(L"\n");
-	
 	//以45°进行缩放
 	xDelta = ORIGIN_POINT.x - pt.x;
-	xDelta = xDelta / abs(xDelta);
+	xDelta = xDelta == 0 ? 0 : xDelta > 0 ? 1 : -1;
+	//xDelta = xDelta / abs(xDelta);
 	yDelta = ORIGIN_POINT.y - pt.y;
-	yDelta = yDelta / abs(yDelta);
+	yDelta = yDelta == 0 ? 0 : yDelta > 0 ? 1 : -1;
+	//yDelta = yDelta / abs(yDelta);
 
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
@@ -630,13 +639,18 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.x = temp.x;
 			pt.y = temp.y;
 
-			SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
+			//SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
 
-			//zoom(wheelDelta);
+			DebugOut() << wheelDelta;
+
+			zoom(wheelDelta);
+			invalidWindow(hwnd);
 		}
 		break;
 	case WM_RBUTTONDOWN:
-		SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
+		setXRange(-100, 100);
+		invalidWindow(hwnd);
+		//SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
 		//CaptureAnImage(hwnd);
 		break;
 	case WM_TIMER:
