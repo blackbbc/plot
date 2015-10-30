@@ -9,6 +9,7 @@
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
+#include "DebugOut.h"
 
 POINTS pt;
 POINTS ptOld;
@@ -26,6 +27,12 @@ HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
 FunctionHelper funcHelper("x^2");
+
+//¶¯»­
+INT animTot = 800;
+INT animCur = 0;
+INT animVel = 30;
+INT animAcce = 1;
 
 void initGraph()
 {
@@ -127,7 +134,7 @@ void drawTick()
 	{
 		tick++;
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
-		if (tick % 5 == 0)
+		if (tick % X_TICK_LABEL == 0)
 		{
 			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
@@ -147,7 +154,7 @@ void drawTick()
 	{
 		tick++;
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
-		if (tick % 5 == 0)
+		if (tick % X_TICK_LABEL == 0)
 		{
 			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
@@ -168,7 +175,7 @@ void drawTick()
 		tick++;
 		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
-		if (tick % 5 == 0)
+		if (tick % Y_TICK_LABEL == 0)
 		{
 			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
@@ -189,7 +196,7 @@ void drawTick()
 		tick++;
 		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
-		if (tick % 5 == 0)
+		if (tick % Y_TICK_LABEL == 0)
 		{
 			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
@@ -227,7 +234,7 @@ void drawGrid()
 	{
 		tick++;
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
-		if (tick % 5 == 0)
+		if (tick % X_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
 			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
@@ -246,7 +253,7 @@ void drawGrid()
 	{
 		tick++;
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
-		if (tick % 5 == 0)
+		if (tick % X_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
 			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
@@ -266,7 +273,7 @@ void drawGrid()
 		tick++;
 		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
-		if (tick % 5 == 0)
+		if (tick % Y_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
 			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
@@ -286,7 +293,7 @@ void drawGrid()
 		tick++;
 		percent = (i - Y_RANGE_LEFT) / getYRangeLength();
 		percent = 1 - percent;
-		if (tick % 5 == 0)
+		if (tick % Y_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
 			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
@@ -353,11 +360,6 @@ void zoom(INT wheelDelta)
 
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
 
-	//for (int i = 0; i < 100; i++)
-	//{
-
-	//}
-
 	if (wheelDelta > 0)
 	{
 		//Zoom In
@@ -407,6 +409,7 @@ void zoom(INT wheelDelta)
 		X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 		Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 	}
+	
 }
 
 int CaptureAnImage(HWND hWnd)
@@ -615,8 +618,6 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 	case WM_MOUSEWHEEL:
 		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-		//msg = std::to_wstring(wheelDelta);
-		//OutputDebugString(msg.c_str());
 		if (wheelDelta != 0)
 		{
 			pt = MAKEPOINTS(lParam);
@@ -627,20 +628,32 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.x = temp.x;
 			pt.y = temp.y;
 
-			//std::wstring msg;
-			//msg = std::to_wstring(pt.x);
-			//OutputDebugString(msg.c_str());
-			//OutputDebugString(L"\n");
-			//msg = std::to_wstring(pt.y);
-			//OutputDebugString(msg.c_str());
-			//OutputDebugString(L"\n");
+			SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
 
-			zoom(wheelDelta);
-			invalidWindow(hwnd);
+			//zoom(wheelDelta);
 		}
 		break;
 	case WM_RBUTTONDOWN:
-		CaptureAnImage(hwnd);
+		SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
+		//CaptureAnImage(hwnd);
+		break;
+	case WM_TIMER:
+		switch (wParam)
+		{
+			case TIMER_ZOOM:
+				animCur += animVel;
+				if (animCur < animTot)
+				{
+					zoom(120);
+					invalidWindow(hwnd);
+				}
+				else
+				{
+					KillTimer(hwnd, TIMER_ZOOM);
+					animCur = 0;
+				}
+				break;
+		}
 		break;
 	case WM_PAINT:
 		//Ë«»º³å»æÍ¼

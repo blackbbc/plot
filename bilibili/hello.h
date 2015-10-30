@@ -16,8 +16,8 @@ DOUBLE X_TICK_DISTANCE = 1;
 DOUBLE Y_TICK_DISTANCE = 1;
 INT X_TICK_PIXEL = 60;
 INT Y_TICK_PIXEL = 60;
-INT X_TICK_LABEL = 5;
-INT Y_TICK_LABEL = 5;
+INT X_TICK_LABEL = 2;
+INT Y_TICK_LABEL = 2;
 
 std::vector<INT> PIXEL_TYPE = { 60, 55, 50, 45, 40 };
 std::vector<INT> DISTANCE_TYPE = { 1, 2, 5 };
@@ -36,3 +36,5 @@ DOUBLE getYRangeLength();
 std::map<std::string, int> pri;
 
 void invalidWindow(HWND &hwnd);
+
+const INT TIMER_ZOOM = 10;
