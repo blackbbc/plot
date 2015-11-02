@@ -6,3 +6,10 @@ bilibili.opensdf
 bilibili.sdf
 bilibili.sln
 bilibili.v12.suo
+*.obj
+*.tlog
+*.TMP
+*.exe
+*.pdb
+*.log
+*.bmp
