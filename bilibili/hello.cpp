@@ -36,8 +36,9 @@ INT animCur = 0;
 INT animVel = 30;
 INT animAcce = 1;
 
-void initGraph()
+void countRange()
 {
+	//X，Y的范围固定
 	//计算X的范围
 	DOUBLE leftSpace, rightSpace;
 	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= WINDOW_WIDTH)
@@ -88,6 +89,22 @@ void initGraph()
 
 }
 
+void countTickSpace()
+{
+
+}
+
+void countTickDistance()
+{
+	//计算原点位置
+	ORIGIN_POINT.x = WINDOW_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
+	ORIGIN_POINT.y = WINDOW_HEIGHT - WINDOW_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
+
+	//计算Tick距离
+	X_TICK_DISTANCE = getXRangeLength() / WINDOW_WIDTH * X_TICK_PIXEL;
+	Y_TICK_DISTANCE = getYRangeLength() / WINDOW_HEIGHT * Y_TICK_PIXEL;
+}
+
 void drawCoordinate()
 {
 	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
@@ -130,7 +147,7 @@ void drawTick()
 	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
-	font = CreateFont(25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, L"Arial");
+	font = CreateFont(21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, L"Arial");
 	oldFont = (HFONT)SelectObject(hMemDC, font);
 
 	INT tick = 0;
@@ -342,7 +359,6 @@ void drawFunction()
 
 void onPaint() 
 {
-	initGraph();
 	drawGrid();
 	drawCoordinate();
 	drawTick();
@@ -383,21 +399,32 @@ void zoom(INT wheelDelta)
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
 		}
 
-		PIXEL_ROUND = PIXEL_ROUND - 1;
-		if (PIXEL_ROUND == -1)
+		if (AUTO_MODE)
 		{
-			PIXEL_ROUND = PIXEL_TYPE.size() - 1;
-			DISTANCE_ROUND = DISTANCE_ROUND - 1;
-			if (DISTANCE_ROUND == -1)
+			PIXEL_ROUND = PIXEL_ROUND - 1;
+			if (PIXEL_ROUND == -1)
 			{
-				DISTANCE_ROUND = DISTANCE_TYPE.size() - 1;
-				RATIO /= 10;
+				PIXEL_ROUND = PIXEL_TYPE.size() - 1;
+				DISTANCE_ROUND = DISTANCE_ROUND - 1;
+				if (DISTANCE_ROUND == -1)
+				{
+					DISTANCE_ROUND = DISTANCE_TYPE.size() - 1;
+					RATIO /= 10;
+				}
+				X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+				Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
 			}
-			X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+			X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+			Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 		}
-		X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
-		Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+		else
+		{
+			//space不要变，只改变distance，distance变两倍
+			X_RANGE_LEFT /= 2;
+			X_RANGE_RIGHT /= 2;
+			Y_RANGE_LEFT /= 2;
+			Y_RANGE_RIGHT /= 2;
+		}
 	}
 	else
 	{
@@ -409,23 +436,31 @@ void zoom(INT wheelDelta)
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
 		}
 
-		X_RANGE_LEFT *= 2;
-		X_RANGE_RIGHT *= 2;
-		Y_RANGE_LEFT *= 2;
-		Y_RANGE_RIGHT *= 2;
-		PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
-		if (PIXEL_ROUND == 0)
+		if (AUTO_MODE)
 		{
-			DISTANCE_ROUND = (DISTANCE_ROUND + 1) % DISTANCE_TYPE.size();
-			if (DISTANCE_ROUND == 0)
+			PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
+			if (PIXEL_ROUND == 0)
 			{
-				RATIO *= 10;
+				DISTANCE_ROUND = (DISTANCE_ROUND + 1) % DISTANCE_TYPE.size();
+				if (DISTANCE_ROUND == 0)
+				{
+					RATIO *= 10;
+				}
+				X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+				Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
 			}
-			X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
+			X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+			Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 		}
-		X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
-		Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
+		else
+		{
+			//grid不要变，只改变distance，distance变两倍
+			X_RANGE_LEFT *= 2;
+			X_RANGE_RIGHT *= 2;
+			Y_RANGE_LEFT *= 2;
+			Y_RANGE_RIGHT *= 2;
+		}
+
 	}
 	
 }
@@ -585,6 +620,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
+	int wmId, wmEvent;
 
 	INT wheelDelta;
 	std::wstring msg;
@@ -593,6 +629,18 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	switch (Msg)
 	{
+	case WM_COMMAND:
+		wmId = LOWORD(wParam);
+		wmEvent = HIWORD(wParam);
+		switch (wmId)
+		{
+		case IDM_EXIT:
+			DestroyWindow(hwnd);
+			break;
+		default:
+			return DefWindowProc(hwnd, Msg, wParam, lParam);
+		}
+		break;
 	case WM_MOUSEMOVE:
 		if (isLButtonDown) 
 		{
@@ -600,6 +648,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 			ORIGIN_POINT.x += pt.x - ptOld.x;
 			ORIGIN_POINT.y += pt.y - ptOld.y;
+
+			countRange();
 			invalidWindow(hwnd);
 			ptOld = pt;
 		}
@@ -647,6 +697,14 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.y = temp.y;
 
 			zoom(wheelDelta);
+			if (AUTO_MODE)
+			{
+				countRange();
+			}
+			else
+			{
+				countTickDistance();
+			}
 			invalidWindow(hwnd);
 		}
 		break;

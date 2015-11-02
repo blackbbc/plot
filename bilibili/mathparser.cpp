@@ -145,7 +145,6 @@ double myroot(double a, double b)
 
 Token getTokenFromExpe(char *buffer)
 {
-	double a, b, c;
 	if (strcmp(buffer, "+") == 0)
 	{
 		return Token{ 3, 0, NULL, myadd };
@@ -300,7 +299,7 @@ double ans[1000];
 //使用后缀表达式求值
 double countexp(vector<Token> &rpn, double xValue)
 {
-	int i, top = 0;
+	unsigned int i, top = 0;
 	Token token;
 
 	/*
