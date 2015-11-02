@@ -122,10 +122,16 @@ wchar_t *getFormat()
 	}
 }
 
+HFONT font;
+HFONT oldFont;
+
 void drawTick()
 {
 	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
+
+	font = CreateFont(25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, L"Arial");
+	oldFont = (HFONT)SelectObject(hMemDC, font);
 
 	INT tick = 0;
 	DOUBLE i, percent;
@@ -216,6 +222,8 @@ void drawTick()
 	}
 
 	SelectObject(hMemDC, hpenOld);
+	SelectObject(hMemDC, oldFont);
+	DeleteObject(font);
 	DeleteObject(hpen);
 }
 
