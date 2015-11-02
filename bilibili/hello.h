@@ -4,6 +4,8 @@
 #include <vector>
 #include <map>
 
+#include "resource.h"
+
 INT WINDOW_WIDTH = 1280;
 INT WINDOW_HEIGHT = 720;
 

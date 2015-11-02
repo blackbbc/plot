@@ -727,6 +727,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	wc.lpszClassName = L"Hello";
 	wc.lpfnWndProc = MyWinProc;
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+	wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
 	wc.style = CS_HREDRAW | CS_VREDRAW;
 
 	atom = RegisterClassEx(&wc);
