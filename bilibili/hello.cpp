@@ -91,7 +91,13 @@ void countRange()
 
 void countTickSpace()
 {
+	//计算原点位置
+	ORIGIN_POINT.x = WINDOW_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
+	ORIGIN_POINT.y = WINDOW_HEIGHT - WINDOW_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
 
+	//计算Tick Pixel
+	X_TICK_PIXEL = WINDOW_WIDTH / getXRangeLength() * X_TICK_DISTANCE;
+	Y_TICK_PIXEL = WINDOW_HEIGHT / getYRangeLength() * Y_TICK_DISTANCE;
 }
 
 void countTickDistance()
@@ -629,6 +635,9 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 	switch (Msg)
 	{
+	case WM_CREATE:
+		countRange();
+		break;
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
