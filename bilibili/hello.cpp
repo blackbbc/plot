@@ -45,6 +45,9 @@ INT_PTR CALLBACK	Setting(HWND, UINT, WPARAM, LPARAM);
 HWND window = NULL;
 HWND settingDialog = NULL;
 
+void updateUI(HWND);
+void fetchFromUI(HWND);
+
 void countRange()
 {
 	//X，Y的范围固定
@@ -783,6 +786,11 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		DeleteDC(hMemDC);
 
 		EndPaint(hwnd, &ps);
+
+		if (settingDialog != NULL)
+		{
+			updateUI(settingDialog);
+		}
 		break;
 	case WM_SIZE:
 		WINDOW_WIDTH = LOWORD(lParam);
@@ -867,8 +875,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 // “设置”框的消息处理程序。
 
-void updateUI(HWND);
-void fetchFromUI(HWND);
+
 
 HDC settingDC = NULL;
 HDC settingMemDC = NULL;
@@ -919,8 +926,12 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDADDFUNCTION:
 		{
 			LPTSTR expression = new TCHAR[128];
+			char *buffer = new char[128];
 			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
-			funcs[numFuncs] = FunctionHelper( (char*) expression);
+
+			wcstombs(buffer, expression, 128);
+
+			funcs[numFuncs] = FunctionHelper(buffer);
 			numFuncs++;
 			invalidWindow(window);
 			break;
