@@ -36,6 +36,11 @@ INT animCur = 0;
 INT animVel = 30;
 INT animAcce = 1;
 
+ATOM				MyRegisterClass(HINSTANCE hInstance);
+BOOL				InitInstance(HINSTANCE, int);
+INT_PTR CALLBACK	Setting(HWND, UINT, WPARAM, LPARAM);
+HWND settingDialog = NULL;
+
 void countRange()
 {
 	//X，Y的范围固定
@@ -646,6 +651,14 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hwnd);
 			break;
+		case IDM_SETTING:
+		{
+			if (settingDialog == NULL)
+			{
+				settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
+			}
+			ShowWindow(settingDialog, SW_NORMAL);
+		}
 		default:
 			return DefWindowProc(hwnd, Msg, wParam, lParam);
 		}
@@ -781,34 +794,13 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	WNDCLASSEX wc;
-	ATOM atom;
-	HWND hwnd;
 	MSG msg;
 
-	mHinstance = hInstance;
-
-	ZeroMemory(&wc, sizeof(wc));
-	wc.cbSize = sizeof(wc);
-	wc.hInstance = hInstance;
-	wc.lpszClassName = L"Hello";
-	wc.lpfnWndProc = MyWinProc;
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
-	wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-
-	atom = RegisterClassEx(&wc);
-	hwnd = CreateWindow(
-		L"HELLO", 
-		L"WindowName", 
-		WS_OVERLAPPEDWINDOW,
-		200, 200, WINDOW_WIDTH, WINDOW_HEIGHT, 
-		NULL, 
-		NULL, 
-		hInstance, 
-		NULL);
-	ShowWindow(hwnd, SW_NORMAL);
-
+	MyRegisterClass(hInstance);
+	if (!InitInstance(hInstance, nCmdShow))
+	{
+		return FALSE;
+	}
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
@@ -817,4 +809,68 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	}
 
 	return 0;
+}
+
+ATOM MyRegisterClass(HINSTANCE hInstance)
+{
+	WNDCLASSEX wc;
+
+	ZeroMemory(&wc, sizeof(wc));
+	wc.cbSize = sizeof(wc);
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.lpszClassName = L"Hello";
+	wc.lpfnWndProc = MyWinProc;
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
+	wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+
+	return RegisterClassEx(&wc);
+}
+
+BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+{
+	HWND hWnd, dia;
+
+	mHinstance = hInstance; // 将实例句柄存储在全局变量中
+
+	hWnd = CreateWindow(
+		L"Hello", 
+		L"Bilibili", 
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, 0, 
+		WINDOW_WIDTH, WINDOW_HEIGHT, 
+		NULL, NULL, hInstance, NULL);
+
+	if (!hWnd)
+	{
+		return FALSE;
+	}
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	return TRUE;
+}
+
+// “设置”框的消息处理程序。
+INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+	switch (message)
+	{
+	case WM_INITDIALOG:
+		return (INT_PTR)TRUE;
+
+	case WM_COMMAND:
+		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+		{
+			EndDialog(hDlg, LOWORD(wParam));
+			settingDialog = NULL;
+			return (INT_PTR)TRUE;
+		}
+		break;
+	}
+	return (INT_PTR)FALSE;
 }
