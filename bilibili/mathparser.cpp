@@ -73,7 +73,7 @@ char *preProcessing(char *src)
 		}
 	}
 	result[j] = '\0';
-	strcat(result, "#");
+	strcat_s(result, 128, "#");
 	return result;
 }
 
