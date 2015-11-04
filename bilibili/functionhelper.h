@@ -13,6 +13,7 @@ private:
 	double xVec[3000];
 	double yVec[3000];
 public:
+	FunctionHelper::FunctionHelper();
 	FunctionHelper::FunctionHelper(char *func);
 
 	void updateXVec();

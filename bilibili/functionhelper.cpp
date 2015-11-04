@@ -2,6 +2,11 @@
 #include "config.h"
 #include "mathparser.h"
 
+FunctionHelper::FunctionHelper()
+{
+
+}
+
 FunctionHelper::FunctionHelper (char *func)
 {
 	initialParser();
@@ -61,12 +66,12 @@ void FunctionHelper::draw(HDC &hdc)
 		percentY = 1 - percentY;
 		if (isFirst == TRUE)
 		{
-			MoveToEx(hdc, WINDOW_WIDTH * percentX, WINDOW_HEIGHT * percentY, NULL);
+			MoveToEx(hdc, (INT)(WINDOW_WIDTH * percentX), (INT)(WINDOW_HEIGHT * percentY), NULL);
 			isFirst = FALSE;
 		}
 		else
 		{
-			LineTo(hdc, WINDOW_WIDTH * percentX, WINDOW_HEIGHT * percentY);
+			LineTo(hdc, (INT)(WINDOW_WIDTH * percentX), (INT)(WINDOW_HEIGHT * percentY));
 		}
 	}
 }

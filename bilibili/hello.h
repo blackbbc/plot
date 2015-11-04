@@ -41,6 +41,3 @@ DOUBLE getYRangeLength();
 std::map<std::string, int> pri;
 
 void invalidWindow(HWND &hwnd);
-
-//缩放动画所需要的参数
-const INT TIMER_ZOOM = 10;

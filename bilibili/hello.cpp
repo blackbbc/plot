@@ -1,10 +1,7 @@
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
 #include <windows.h>
 #include <string>
 #include <cmath>
+#include <vector>
 #include <chrono>
 #include "hello.h"
 #include "config.h"
@@ -28,9 +25,14 @@ HANDLE hOld;
 HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
-FunctionHelper funcHelper("x^2");
 
-//动画
+//FunctionHelper funcHelper("x^2");
+
+FunctionHelper funcs[100];
+INT numFuncs = 0;
+
+//缩放动画所需要的参数
+const INT TIMER_ZOOM = 10;
 INT animTot = 800;
 INT animCur = 0;
 INT animVel = 30;
@@ -358,7 +360,10 @@ void drawFunction()
 	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-	funcHelper.draw(hMemDC);
+	for (int i = 0; i < numFuncs; i++)
+	{
+		funcs[i].draw(hMemDC);
+	}
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
@@ -780,6 +785,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		WINDOW_WIDTH = LOWORD(lParam);
 		WINDOW_HEIGHT = HIWORD(lParam);
+		countRange();
 		break;
 	case WM_ERASEBKGND:
 		return 1;
@@ -790,6 +796,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		return ::DefWindowProc(hwnd, Msg, wParam, lParam);
 	}
 
+	return 0;
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -831,7 +838,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-	HWND hWnd, dia;
+	HWND hWnd;
 
 	mHinstance = hInstance; // 将实例句柄存储在全局变量中
 
@@ -855,12 +862,21 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 }
 
 // “设置”框的消息处理程序。
+
+void updateUI(HWND);
+void fetchFromUI(HWND);
+
+HDC settingDC = NULL;
+HDC settingMemDC = NULL;
+HBITMAP settingMemBM = NULL;
+PAINTSTRUCT settingPs;
 INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(lParam);
 	switch (message)
 	{
 	case WM_INITDIALOG:
+		updateUI(hDlg);
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
@@ -871,6 +887,57 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			return (INT_PTR)TRUE;
 		}
 		break;
+	case WM_PAINT:
+		settingDC = BeginPaint(hDlg, &settingPs);
+
+		RECT rcClient;
+		GetClientRect(hDlg, &rcClient);
+
+		settingMemDC = CreateCompatibleDC(settingDC);
+		settingMemBM = CreateCompatibleBitmap(settingDC, rcClient.right, rcClient.bottom);
+		hOld = SelectObject(settingMemDC, settingMemBM);
+		FillRect(settingMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
+
+		//开始作图
+		//MoveToEx(settingMemDC, 10, 10, NULL);
+		//LineTo(settingMemDC, 100, 100);
+
+		//画一个矩形表示背景颜色
+		//画一条线表示函数颜色
+
+
+		//作图结束
+
+		BitBlt(settingDC, 0, 0, rcClient.right, rcClient.bottom, settingMemDC, 0, 0, SRCCOPY);
+
+		SelectObject(settingMemDC, hOld);
+		DeleteObject(settingMemBM);
+		DeleteDC(settingMemDC);
+
+		EndPaint(hDlg, &ps);
+		break;
 	}
 	return (INT_PTR)FALSE;
+}
+
+void updateUI(HWND hDlg)
+{
+	SetDlgItemText(hDlg, IDC_X_RANGE_LEFT, std::to_wstring(X_RANGE_LEFT).c_str());
+	SetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, std::to_wstring(X_RANGE_RIGHT).c_str());
+	SetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, std::to_wstring(Y_RANGE_LEFT).c_str());
+	SetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, std::to_wstring(Y_RANGE_RIGHT).c_str());
+
+	SetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, std::to_wstring(X_TICK_DISTANCE).c_str());
+	SetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, std::to_wstring(Y_TICK_DISTANCE).c_str());
+	
+	SetDlgItemText(hDlg, IDC_X_TICK_LABEL, std::to_wstring(X_TICK_LABEL).c_str());
+	SetDlgItemText(hDlg, IDC_Y_TICK_LABEL, std::to_wstring(Y_TICK_LABEL).c_str());
+
+	SetDlgItemText(hDlg, IDC_X_TICK_PIXEL, std::to_wstring(X_TICK_PIXEL).c_str());
+	SetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, std::to_wstring(Y_TICK_PIXEL).c_str());
+}
+
+void fetchFromUI()
+{
+
 }
