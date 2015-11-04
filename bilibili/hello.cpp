@@ -3,6 +3,7 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
+#include <CommCtrl.h>
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
@@ -872,21 +873,53 @@ HBITMAP settingMemBM = NULL;
 PAINTSTRUCT settingPs;
 INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	UNREFERENCED_PARAMETER(lParam);
+	int wmId, wmEvent;
 	switch (message)
 	{
 	case WM_INITDIALOG:
+	{
+		// 设置ListView的列  
+		HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+		LVCOLUMN vcl;
+		vcl.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
+		// 第一列  
+		vcl.pszText = L"函数";//列标题  
+		vcl.cx = 200;//列宽  
+		vcl.iSubItem = 0;//子项索引，第一列无子项  
+		ListView_InsertColumn(listView, 0, &vcl);
+		// 第二列  
+		vcl.pszText = L"颜色";
+		vcl.cx = 59;
+		vcl.iSubItem = 1;//子项索引  
+		ListView_InsertColumn(listView, 1, &vcl);
+		//更新其他控件的值
 		updateUI(hDlg);
-		return (INT_PTR)TRUE;
 
+		return (INT_PTR)TRUE;
+	}
 	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+	{
+		wmId = LOWORD(wParam);
+		wmEvent = HIWORD(wParam);
+		switch (wmId)
 		{
+		case IDOK:
 			EndDialog(hDlg, LOWORD(wParam));
 			settingDialog = NULL;
 			return (INT_PTR)TRUE;
+			break;
+		case IDCANCEL:
+			EndDialog(hDlg, LOWORD(wParam));
+			settingDialog = NULL;
+			return (INT_PTR)TRUE;
+			break;
+		case IDADDFUNCTION:
+			break;
+		default:
+			break;
 		}
 		break;
+	}
 	case WM_PAINT:
 		settingDC = BeginPaint(hDlg, &settingPs);
 
@@ -935,6 +968,24 @@ void updateUI(HWND hDlg)
 
 	SetDlgItemText(hDlg, IDC_X_TICK_PIXEL, std::to_wstring(X_TICK_PIXEL).c_str());
 	SetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, std::to_wstring(Y_TICK_PIXEL).c_str());
+
+	if (SHOW_GRID)
+	{
+		CheckDlgButton(hDlg, IDC_SHOW_GRID, BST_CHECKED);
+	}
+	else
+	{
+		CheckDlgButton(hDlg, IDC_SHOW_GRID, BST_UNCHECKED);
+	}
+
+	if (AUTO_MODE)
+	{
+		CheckDlgButton(hDlg, IDC_AUTO_MODE, BST_CHECKED);
+	}
+	else
+	{
+		CheckDlgButton(hDlg, IDC_AUTO_MODE, BST_UNCHECKED);
+	}
 }
 
 void fetchFromUI()
