@@ -902,7 +902,17 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		vcl.cx = 59;
 		vcl.iSubItem = 1;//子项索引  
 		ListView_InsertColumn(listView, 1, &vcl);
-		//更新其他控件的值
+		//填充listview
+
+		LVITEM vitem;
+		vitem.mask = LVIF_TEXT;
+		for (int i = 0; i < numFuncs; i++)
+		{
+			vitem.pszText = funcs[i].getFunc();
+			vitem.iItem = i;
+			vitem.iSubItem = 0;
+			ListView_InsertItem(listView, &vitem);
+		}
 		updateUI(hDlg);
 
 		return (INT_PTR)TRUE;
@@ -926,12 +936,19 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDADDFUNCTION:
 		{
 			LPTSTR expression = new TCHAR[128];
-			char *buffer = new char[128];
 			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
+			funcs[numFuncs] = FunctionHelper(expression);
 
-			wcstombs(buffer, expression, 128);
+			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+			LVITEM vitem;
+			vitem.mask = LVIF_TEXT;
 
-			funcs[numFuncs] = FunctionHelper(buffer);
+			vitem.pszText = expression;
+			vitem.iItem = numFuncs;
+			vitem.iSubItem = 0;
+			ListView_InsertItem(listView, &vitem);
+
+
 			numFuncs++;
 			invalidWindow(window);
 			break;

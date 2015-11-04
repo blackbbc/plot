@@ -9,20 +9,20 @@ class FunctionHelper
 {
 private:
 	char *_func;
-	char *_raw;
+	LPTSTR _raw;
 	std::vector<Token> _rpn;
 	double xVec[3000];
 	double yVec[3000];
 public:
 	FunctionHelper::FunctionHelper();
-	FunctionHelper::FunctionHelper(char *func);
+	FunctionHelper::FunctionHelper(LPTSTR func);
 
 	void updateXVec();
 	void updateYVec();
 
 	DOUBLE getY(DOUBLE x);
 
-	char *getFunc();
+	LPTSTR getFunc();
 
 	void draw(HDC &hdc);
 };

@@ -7,11 +7,15 @@ FunctionHelper::FunctionHelper()
 
 }
 
-FunctionHelper::FunctionHelper (char *func)
+FunctionHelper::FunctionHelper (LPTSTR func)
 {
 	initialParser();
 	this->_raw = func;
-	this->_func = preProcessing(func);
+
+	char *buffer = new char[128];
+	wcstombs(buffer, func, 128);
+
+	this->_func = preProcessing(buffer);
 	this->_rpn = getRPN(this->_func);
 }
 
@@ -42,7 +46,7 @@ DOUBLE FunctionHelper::getY(DOUBLE x)
 }
 
 
-char *FunctionHelper::getFunc()
+LPTSTR FunctionHelper::getFunc()
 {
 	return this->_raw;
 }
