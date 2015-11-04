@@ -948,9 +948,20 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			vitem.iSubItem = 0;
 			ListView_InsertItem(listView, &vitem);
 
-
 			numFuncs++;
 			invalidWindow(window);
+			break;
+		}
+		case IDDELETEFUNCTION:
+		{
+			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+			int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+			if (iPos != -1)
+			{
+				ListView_DeleteItem(listView, iPos);
+				numFuncs--;
+				invalidWindow(window);
+			}
 			break;
 		}
 		default:
