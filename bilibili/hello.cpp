@@ -42,6 +42,7 @@ INT animAcce = 1;
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 INT_PTR CALLBACK	Setting(HWND, UINT, WPARAM, LPARAM);
+HWND window = NULL;
 HWND settingDialog = NULL;
 
 void countRange()
@@ -851,6 +852,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		WINDOW_WIDTH, WINDOW_HEIGHT, 
 		NULL, NULL, hInstance, NULL);
 
+	window = hWnd;
+
 	if (!hWnd)
 	{
 		return FALSE;
@@ -914,7 +917,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			return (INT_PTR)TRUE;
 			break;
 		case IDADDFUNCTION:
+		{
+			LPTSTR expression = new TCHAR[128];
+			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
+			funcs[numFuncs] = FunctionHelper( (char*) expression);
+			numFuncs++;
+			invalidWindow(window);
 			break;
+		}
 		default:
 			break;
 		}

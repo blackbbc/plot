@@ -10,6 +10,7 @@ FunctionHelper::FunctionHelper()
 FunctionHelper::FunctionHelper (char *func)
 {
 	initialParser();
+	this->_raw = func;
 	this->_func = preProcessing(func);
 	this->_rpn = getRPN(this->_func);
 }
@@ -38,6 +39,12 @@ void FunctionHelper::updateYVec()
 DOUBLE FunctionHelper::getY(DOUBLE x)
 {
 	return countexp(this->_rpn, x);
+}
+
+
+char *FunctionHelper::getFunc()
+{
+	return this->_raw;
 }
 
 void FunctionHelper::draw(HDC &hdc)

@@ -9,6 +9,7 @@ class FunctionHelper
 {
 private:
 	char *_func;
+	char *_raw;
 	std::vector<Token> _rpn;
 	double xVec[3000];
 	double yVec[3000];
@@ -20,6 +21,8 @@ public:
 	void updateYVec();
 
 	DOUBLE getY(DOUBLE x);
+
+	char *getFunc();
 
 	void draw(HDC &hdc);
 };
