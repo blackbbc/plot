@@ -939,6 +939,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			LPTSTR expression = new TCHAR[128];
 			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
+
 			funcs[numFuncs] = FunctionHelper(expression);
 
 			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
@@ -968,6 +969,32 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		//ºÏ≤‚”√ªß ‰»Î
 		case IDC_X_RANGE_LEFT:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
+				X_RANGE_LEFT = _wtof(buffer);
+				countTickDistance();
+				invalidWindow(window);
+			}
+			break;
+		}
+		case IDC_X_RANGE_RIGHT:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				DebugOut() << "OK";
+			}
+		}
+		case IDC_Y_RANGE_LEFT:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				DebugOut() << "OK";
+			}
+		}
+		case IDC_Y_RANGE_RIGHT:
 		{
 			if (wmEvent == EN_KILLFOCUS)
 			{
