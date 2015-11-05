@@ -1108,7 +1108,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (wmEvent == BN_CLICKED)
 			{
-				SHOW_GRID == (IsDlgButtonChecked(settingDialog, IDC_SHOW_GRID) == BST_CHECKED) ? TRUE : FALSE;
+				if (IsDlgButtonChecked(settingDialog, IDC_SHOW_GRID) == BST_CHECKED)
+				{
+					SHOW_GRID = TRUE;
+				}
+				else
+				{
+					SHOW_GRID = FALSE;
+				}
 				updateUI(settingDialog);
 				invalidWindow(window);
 			}
@@ -1118,7 +1125,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (wmEvent == BN_CLICKED)
 			{
-				AUTO_MODE == (IsDlgButtonChecked(settingDialog, IDC_AUTO_MODE) == BST_CHECKED) ? TRUE : FALSE;
+				if (IsDlgButtonChecked(settingDialog, IDC_AUTO_MODE) == BST_CHECKED)
+				{
+					AUTO_MODE = TRUE;
+				}
+				else
+				{
+					AUTO_MODE = FALSE;
+				}
 				updateUI(settingDialog);
 				invalidWindow(window);
 			}
