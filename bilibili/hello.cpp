@@ -940,19 +940,27 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			LPTSTR expression = new TCHAR[128];
 			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
 
-			funcs[numFuncs] = FunctionHelper(expression);
+			if (expression[0] != 0)
+			{
+				funcs[numFuncs] = FunctionHelper(expression);
 
-			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-			LVITEM vitem;
-			vitem.mask = LVIF_TEXT;
+				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+				LVITEM vitem;
+				vitem.mask = LVIF_TEXT;
 
-			vitem.pszText = expression;
-			vitem.iItem = numFuncs;
-			vitem.iSubItem = 0;
-			ListView_InsertItem(listView, &vitem);
+				vitem.pszText = expression;
+				vitem.iItem = numFuncs;
+				vitem.iSubItem = 0;
+				ListView_InsertItem(listView, &vitem);
 
-			numFuncs++;
-			invalidWindow(window);
+				numFuncs++;
+				invalidWindow(window);
+			}
+			else
+			{
+				MessageBox(settingDialog, L"函数不能为空", NULL, NULL);
+			}
+			delete expression;
 			break;
 		}
 		case IDDELETEFUNCTION:
@@ -977,6 +985,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				X_RANGE_LEFT = _wtof(buffer);
 				countTickDistance();
 				invalidWindow(window);
+				delete buffer;
 			}
 			break;
 		}
@@ -984,22 +993,136 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (wmEvent == EN_KILLFOCUS)
 			{
-				DebugOut() << "OK";
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
+				X_RANGE_RIGHT = _wtof(buffer);
+				countTickDistance();
+				invalidWindow(window);
+				delete buffer;
 			}
+			break;
 		}
 		case IDC_Y_RANGE_LEFT:
 		{
 			if (wmEvent == EN_KILLFOCUS)
 			{
-				DebugOut() << "OK";
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
+				Y_RANGE_LEFT = _wtof(buffer);
+				countTickDistance();
+				invalidWindow(window);
+				delete buffer;
 			}
+			break;
 		}
 		case IDC_Y_RANGE_RIGHT:
 		{
 			if (wmEvent == EN_KILLFOCUS)
 			{
-				DebugOut() << "OK";
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
+				Y_RANGE_RIGHT = _wtof(buffer);
+				countTickDistance();
+				invalidWindow(window);
+				delete buffer;
 			}
+			break;
+		}
+		case IDC_X_TICK_DISTANCE:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, buffer, 128);
+				X_TICK_DISTANCE = _wtof(buffer);
+				countTickSpace();
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_Y_TICK_DISTANCE:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
+				X_TICK_DISTANCE = _wtof(buffer);
+				countTickSpace();
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_X_TICK_LABEL:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_X_TICK_LABEL, buffer, 128);
+				X_TICK_LABEL = _wtoi(buffer);
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_Y_TICK_LABEL:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_Y_TICK_LABEL, buffer, 128);
+				Y_TICK_LABEL = _wtoi(buffer);
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_X_TICK_PIXEL:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
+				X_TICK_LABEL = _wtoi(buffer);
+				countTickDistance();
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_Y_TICK_PIXEL:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				LPTSTR buffer = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
+				Y_TICK_LABEL = _wtoi(buffer);
+				countTickDistance();
+				invalidWindow(window);
+				delete buffer;
+			}
+			break;
+		}
+		case IDC_SHOW_GRID:
+		{
+			if (wmEvent == BN_CLICKED)
+			{
+				SHOW_GRID == (IsDlgButtonChecked(settingDialog, IDC_SHOW_GRID) == BST_CHECKED) ? TRUE : FALSE;
+				updateUI(settingDialog);
+				invalidWindow(window);
+			}
+			break;
+		}
+		case IDC_AUTO_MODE:
+		{
+			if (wmEvent == BN_CLICKED)
+			{
+				AUTO_MODE == (IsDlgButtonChecked(settingDialog, IDC_AUTO_MODE) == BST_CHECKED) ? TRUE : FALSE;
+				updateUI(settingDialog);
+				invalidWindow(window);
+			}
+			break;
 		}
 		default:
 			break;
