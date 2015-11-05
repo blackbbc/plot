@@ -46,7 +46,6 @@ HWND window = NULL;
 HWND settingDialog = NULL;
 
 void updateUI(HWND);
-void fetchFromUI(HWND);
 
 void countRange()
 {
@@ -821,8 +820,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
 
 	return 0;
@@ -964,9 +966,19 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			break;
 		}
+		//ºÏ≤‚”√ªß ‰»Î
+		case IDC_X_RANGE_LEFT:
+		{
+			if (wmEvent == EN_KILLFOCUS)
+			{
+				DebugOut() << "OK";
+			}
+		}
 		default:
 			break;
 		}
+
+
 		break;
 	}
 	case WM_PAINT:
@@ -1035,9 +1047,4 @@ void updateUI(HWND hDlg)
 	{
 		CheckDlgButton(hDlg, IDC_AUTO_MODE, BST_UNCHECKED);
 	}
-}
-
-void fetchFromUI()
-{
-
 }
