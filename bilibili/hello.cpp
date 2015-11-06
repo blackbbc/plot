@@ -645,6 +645,7 @@ void TrackMouse(HWND hwnd)
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
+	INT wheelDelta;
 
 	switch (Msg)
 	{
@@ -680,6 +681,30 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			return DefWindowProc(hwnd, Msg, wParam, lParam);
 		}
 		break;
+	case WM_MOUSEWHEEL:
+		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+		if (wheelDelta != 0)
+		{
+			pt = MAKEPOINTS(lParam);
+			POINT temp;
+			temp.x = pt.x;
+			temp.y = pt.y;
+			ScreenToClient(window, &temp);
+			pt.x = temp.x;
+			pt.y = temp.y;
+
+			zoom(wheelDelta);
+			if (AUTO_MODE)
+			{
+				countRange();
+			}
+			else
+			{
+				countTickDistance();
+			}
+			invalidWindow(functionDialog);
+		}
+		break;
 	case WM_SIZE:
 		WINDOW_WIDTH = LOWORD(lParam);
 		WINDOW_HEIGHT = HIWORD(lParam);
@@ -704,7 +729,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg))
+		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg) || !IsDialogMessage(functionDialog, &msg))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -766,8 +791,6 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
 	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 
-	INT wheelDelta;
-	std::wstring msg;
 
 	static bool Tracking = FALSE;
 
@@ -819,30 +842,6 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			OutputDebugString(L"MouseLeave\n");
 		}
 		isLButtonDown = FALSE;
-	case WM_MOUSEWHEEL:
-		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-		if (wheelDelta != 0)
-		{
-			pt = MAKEPOINTS(lParam);
-			POINT temp;
-			temp.x = pt.x;
-			temp.y = pt.y;
-			ScreenToClient(hDlg, &temp);
-			pt.x = temp.x;
-			pt.y = temp.y;
-
-			zoom(wheelDelta);
-			if (AUTO_MODE)
-			{
-				countRange();
-			}
-			else
-			{
-				countTickDistance();
-			}
-			invalidWindow(hDlg);
-		}
-		break;
 	case WM_RBUTTONDOWN:
 		invalidWindow(hDlg);
 		//CaptureAnImage(hwnd);
@@ -1180,8 +1179,8 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		//LineTo(settingMemDC, 100, 100);
 
 		//画一个矩形表示背景颜色
-		//画一条线表示函数颜色
 
+		//画一个线条表示函数颜色
 
 		//作图结束
 
