@@ -399,13 +399,16 @@ void setYRange(DOUBLE left, DOUBLE right)
 
 void zoom(INT wheelDelta)
 {
-	DOUBLE xDelta, yDelta, zDelta;
+	DOUBLE xDelta, yDelta, zDelta, xRaw, yRaw, zRaw;
 	INT zoomCoefficient = 10;
 
 	//以45°进行缩放
 	xDelta = ORIGIN_POINT.x - pt.x;
-	xDelta = xDelta == 0 ? 0 : xDelta > 0 ? 1 : -1;
 	yDelta = ORIGIN_POINT.y - pt.y;
+	xRaw = xDelta;
+	yRaw = yDelta;
+	zRaw = xDelta * xDelta + yDelta * yDelta;
+	xDelta = xDelta == 0 ? 0 : xDelta > 0 ? 1 : -1;
 	yDelta = yDelta == 0 ? 0 : yDelta > 0 ? 1 : -1;
 
 	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
@@ -450,7 +453,7 @@ void zoom(INT wheelDelta)
 	{
 		//Zoom Out
 		zoomCoefficient = -zoomCoefficient;
-		if (zDelta > 0)
+		if (zDelta > 0 && zRaw > 65)
 		{
 			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
 			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
@@ -1084,7 +1087,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				LPTSTR buffer = new TCHAR[128];
 				GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
-				X_TICK_LABEL = _wtoi(buffer);
+				X_TICK_PIXEL = _wtoi(buffer);
 				countTickDistance();
 				invalidWindow(window);
 				delete buffer;
@@ -1097,7 +1100,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				LPTSTR buffer = new TCHAR[128];
 				GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
-				Y_TICK_LABEL = _wtoi(buffer);
+				Y_TICK_PIXEL = _wtoi(buffer);
 				countTickDistance();
 				invalidWindow(window);
 				delete buffer;
