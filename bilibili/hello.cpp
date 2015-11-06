@@ -44,6 +44,7 @@ BOOL				InitInstance(HINSTANCE, int);
 INT_PTR CALLBACK	Setting(HWND, UINT, WPARAM, LPARAM);
 HWND window = NULL;
 HWND settingDialog = NULL;
+HWND functionDialog = NULL;
 
 void updateUI(HWND);
 
