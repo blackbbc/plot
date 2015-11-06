@@ -1234,19 +1234,13 @@ void updateUI(HWND hDlg)
 
 void updateResolution()
 {
-	RECT rcWindow; 
-	RECT rcSetting;
-	RECT rcFunction;
-
-	GetClientRect(window, &rcWindow);
 	if (settingDialog != NULL)
 	{
-		GetClientRect(settingDialog, &rcSetting);
-		FUNCTION_WIDTH = rcWindow.right - rcSetting.right;
-		FUNCTION_HEIGHT = rcWindow.bottom;
+		FUNCTION_WIDTH = WINDOW_WIDTH - SETTING_WIDTH;
+		FUNCTION_HEIGHT = WINDOW_HEIGHT;
 
 		//ÉèÖÃ¿ò
-		MoveWindow(settingDialog, rcWindow.right - rcSetting.right, 0, rcSetting.right, rcWindow.bottom, FALSE); //place b at (x,y,w,h) in a
+		MoveWindow(settingDialog, WINDOW_WIDTH - SETTING_WIDTH, 0, SETTING_WIDTH, WINDOW_HEIGHT, FALSE);
 		invalidWindow(settingDialog);
 		//º¯Êý¿ò
 		MoveWindow(functionDialog, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, FALSE);
@@ -1254,8 +1248,8 @@ void updateResolution()
 	}
 	else
 	{
-		FUNCTION_WIDTH = rcWindow.right;
-		FUNCTION_HEIGHT = rcWindow.bottom;
+		FUNCTION_WIDTH = WINDOW_WIDTH;
+		FUNCTION_HEIGHT = WINDOW_HEIGHT;
 		//º¯Êý¿ò
 		MoveWindow(functionDialog, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, FALSE);
 		invalidWindow(functionDialog);
