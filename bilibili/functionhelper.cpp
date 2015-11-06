@@ -22,9 +22,9 @@ FunctionHelper::FunctionHelper (LPTSTR func)
 void FunctionHelper::updateXVec()
 {
 	INT i;
-	DOUBLE gapX = getXRangeLength() / WINDOW_WIDTH;
+	DOUBLE gapX = getXRangeLength() / FUNCTION_WIDTH;
 
-	for (i = 0; i < WINDOW_WIDTH; i++)
+	for (i = 0; i < FUNCTION_WIDTH; i++)
 	{
 		xVec[i] = X_RANGE_LEFT + gapX * i;
 	}
@@ -34,7 +34,7 @@ void FunctionHelper::updateXVec()
 void FunctionHelper::updateYVec()
 {
 	INT i;
-	for (i = 0; i < WINDOW_WIDTH; i++)
+	for (i = 0; i < FUNCTION_WIDTH; i++)
 	{
 		yVec[i] = getY(xVec[i]);
 	}
@@ -63,7 +63,7 @@ void FunctionHelper::draw(HDC &hdc)
 	updateXVec();
 	updateYVec();
 
-	for (i = 0; i < WINDOW_WIDTH; i++)
+	for (i = 0; i < FUNCTION_WIDTH; i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
 		if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
@@ -77,12 +77,12 @@ void FunctionHelper::draw(HDC &hdc)
 		percentY = 1 - percentY;
 		if (isFirst == TRUE)
 		{
-			MoveToEx(hdc, (INT)(WINDOW_WIDTH * percentX), (INT)(WINDOW_HEIGHT * percentY), NULL);
+			MoveToEx(hdc, (INT)(FUNCTION_WIDTH * percentX), (INT)(FUNCTION_HEIGHT * percentY), NULL);
 			isFirst = FALSE;
 		}
 		else
 		{
-			LineTo(hdc, (INT)(WINDOW_WIDTH * percentX), (INT)(WINDOW_HEIGHT * percentY));
+			LineTo(hdc, (INT)(FUNCTION_WIDTH * percentX), (INT)(FUNCTION_HEIGHT * percentY));
 		}
 	}
 }

@@ -42,44 +42,46 @@ INT animAcce = 1;
 ATOM				MyRegisterClass(HINSTANCE hInstance);
 BOOL				InitInstance(HINSTANCE, int);
 INT_PTR CALLBACK	Setting(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK	Func(HWND, UINT, WPARAM, LPARAM);
 HWND window = NULL;
 HWND settingDialog = NULL;
 HWND functionDialog = NULL;
 
 void updateUI(HWND);
+void updateResolution();
 
 void countRange()
 {
 	//X，Y的范围固定
 	//计算X的范围
 	DOUBLE leftSpace, rightSpace;
-	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= WINDOW_WIDTH)
+	if (ORIGIN_POINT.x >= 0 && ORIGIN_POINT.x <= FUNCTION_WIDTH)
 	{
 		leftSpace = ORIGIN_POINT.x;
-		rightSpace = WINDOW_WIDTH - ORIGIN_POINT.x;
+		rightSpace = FUNCTION_WIDTH - ORIGIN_POINT.x;
 		X_RANGE_LEFT = -leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 		X_RANGE_RIGHT = rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 	}
 	else if (ORIGIN_POINT.x < 0)
 	{
 		leftSpace = -ORIGIN_POINT.x;
-		rightSpace = leftSpace + WINDOW_WIDTH;
+		rightSpace = leftSpace + FUNCTION_WIDTH;
 		X_RANGE_LEFT = leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 		X_RANGE_RIGHT = rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 	}
 	else
 	{
 		leftSpace = ORIGIN_POINT.x;
-		rightSpace = ORIGIN_POINT.x - WINDOW_WIDTH;
+		rightSpace = ORIGIN_POINT.x - FUNCTION_WIDTH;
 		X_RANGE_LEFT = -leftSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 		X_RANGE_RIGHT = -rightSpace * X_TICK_DISTANCE / X_TICK_PIXEL;
 	}
 
 	//计算Y的范围
 	DOUBLE topSpace, bottomSpace;
-	if (ORIGIN_POINT.y >= 0 && ORIGIN_POINT.y <= WINDOW_HEIGHT)
+	if (ORIGIN_POINT.y >= 0 && ORIGIN_POINT.y <= FUNCTION_HEIGHT)
 	{
-		bottomSpace = WINDOW_HEIGHT - ORIGIN_POINT.y;
+		bottomSpace = FUNCTION_HEIGHT - ORIGIN_POINT.y;
 		topSpace = ORIGIN_POINT.y;
 		Y_RANGE_LEFT = -bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
 		Y_RANGE_RIGHT = topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
@@ -87,13 +89,13 @@ void countRange()
 	else if (ORIGIN_POINT.y < 0)
 	{
 		bottomSpace = -ORIGIN_POINT.y;
-		topSpace = bottomSpace + WINDOW_HEIGHT;
+		topSpace = bottomSpace + FUNCTION_HEIGHT;
 		Y_RANGE_LEFT = -topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
 		Y_RANGE_RIGHT = -bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
 	}
 	else
 	{
-		bottomSpace = ORIGIN_POINT.y - WINDOW_HEIGHT;
+		bottomSpace = ORIGIN_POINT.y - FUNCTION_HEIGHT;
 		topSpace = ORIGIN_POINT.y;
 		Y_RANGE_LEFT = bottomSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
 		Y_RANGE_RIGHT = topSpace * Y_TICK_DISTANCE / Y_TICK_PIXEL;
@@ -104,23 +106,23 @@ void countRange()
 void countTickSpace()
 {
 	//计算原点位置
-	ORIGIN_POINT.x = WINDOW_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
-	ORIGIN_POINT.y = WINDOW_HEIGHT - WINDOW_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
+	ORIGIN_POINT.x = FUNCTION_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
+	ORIGIN_POINT.y = FUNCTION_HEIGHT - FUNCTION_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
 
 	//计算Tick Pixel
-	X_TICK_PIXEL = WINDOW_WIDTH / getXRangeLength() * X_TICK_DISTANCE;
-	Y_TICK_PIXEL = WINDOW_HEIGHT / getYRangeLength() * Y_TICK_DISTANCE;
+	X_TICK_PIXEL = FUNCTION_WIDTH / getXRangeLength() * X_TICK_DISTANCE;
+	Y_TICK_PIXEL = FUNCTION_HEIGHT / getYRangeLength() * Y_TICK_DISTANCE;
 }
 
 void countTickDistance()
 {
 	//计算原点位置
-	ORIGIN_POINT.x = WINDOW_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
-	ORIGIN_POINT.y = WINDOW_HEIGHT - WINDOW_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
+	ORIGIN_POINT.x = FUNCTION_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
+	ORIGIN_POINT.y = FUNCTION_HEIGHT - FUNCTION_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
 
 	//计算Tick距离
-	X_TICK_DISTANCE = getXRangeLength() / WINDOW_WIDTH * X_TICK_PIXEL;
-	Y_TICK_DISTANCE = getYRangeLength() / WINDOW_HEIGHT * Y_TICK_PIXEL;
+	X_TICK_DISTANCE = getXRangeLength() / FUNCTION_WIDTH * X_TICK_PIXEL;
+	Y_TICK_DISTANCE = getYRangeLength() / FUNCTION_HEIGHT * Y_TICK_PIXEL;
 }
 
 void drawCoordinate()
@@ -129,9 +131,9 @@ void drawCoordinate()
 	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
 	MoveToEx(hMemDC, 0, ORIGIN_POINT.y, NULL);
-	LineTo(hMemDC, WINDOW_WIDTH, ORIGIN_POINT.y);
+	LineTo(hMemDC, FUNCTION_WIDTH, ORIGIN_POINT.y);
 	MoveToEx(hMemDC, ORIGIN_POINT.x, 0, NULL);
-	LineTo(hMemDC, ORIGIN_POINT.x, WINDOW_HEIGHT);
+	LineTo(hMemDC, ORIGIN_POINT.x, FUNCTION_HEIGHT);
 
 	SelectObject(hMemDC, hpenOld);
 	DeleteObject(hpen);
@@ -181,16 +183,16 @@ void drawTick()
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % X_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, WINDOW_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
@@ -201,16 +203,16 @@ void drawTick()
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % X_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, WINDOW_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 5);
 		}
 	}
 
@@ -222,16 +224,16 @@ void drawTick()
 		percent = 1 - percent;
 		if (tick % Y_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 5, FUNCTION_HEIGHT * percent);
 		}
 	}
 
@@ -243,16 +245,16 @@ void drawTick()
 		percent = 1 - percent;
 		if (tick % Y_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 10, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, WINDOW_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 5, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, ORIGIN_POINT.x + 5, FUNCTION_HEIGHT * percent);
 		}
 	}
 
@@ -284,14 +286,14 @@ void drawGrid()
 		if (tick % X_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, FUNCTION_HEIGHT);
 		}
 		else
 		{
 			SelectObject(hMemDC, gridPen);
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, FUNCTION_HEIGHT);
 		}
 	}
 
@@ -303,14 +305,14 @@ void drawGrid()
 		if (tick % X_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, FUNCTION_HEIGHT);
 		}
 		else
 		{
 			SelectObject(hMemDC, gridPen);
-			MoveToEx(hMemDC, WINDOW_WIDTH * percent, 0, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH * percent, WINDOW_HEIGHT);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, 0, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, FUNCTION_HEIGHT);
 		}
 	}
 
@@ -323,14 +325,14 @@ void drawGrid()
 		if (tick % Y_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
-			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, 0, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH, FUNCTION_HEIGHT * percent);
 		}
 		else
 		{
 			SelectObject(hMemDC, gridPen);
-			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, 0, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH, FUNCTION_HEIGHT * percent);
 		}
 	}
 
@@ -343,14 +345,14 @@ void drawGrid()
 		if (tick % Y_TICK_LABEL == 0)
 		{
 			SelectObject(hMemDC, gridBoldPen);
-			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, 0, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH, FUNCTION_HEIGHT * percent);
 		}
 		else
 		{
 			SelectObject(hMemDC, gridPen);
-			MoveToEx(hMemDC, 0, WINDOW_HEIGHT * percent, NULL);
-			LineTo(hMemDC, WINDOW_WIDTH, WINDOW_HEIGHT * percent);
+			MoveToEx(hMemDC, 0, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH, FUNCTION_HEIGHT * percent);
 		}
 	}
 
@@ -523,7 +525,7 @@ int CaptureAnImage(HWND hWnd)
 	if (!BitBlt(
 		hdcWindow, 
 		100, 100, 
-		WINDOW_WIDTH, WINDOW_HEIGHT, 
+		FUNCTION_WIDTH, FUNCTION_HEIGHT, 
 		hdcMemDC, 
 		0, 0, 
 		SRCCOPY))
@@ -642,178 +644,47 @@ void TrackMouse(HWND hwnd)
 
 LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
-	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 	int wmId, wmEvent;
-
-	INT wheelDelta;
-	std::wstring msg;
-
-	static bool Tracking = FALSE;
 
 	switch (Msg)
 	{
 	case WM_CREATE:
-		countRange();
+		functionDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_FUNCTION), hwnd, Func);
+		updateResolution();
+		ShowWindow(functionDialog, SW_NORMAL);
 		break;
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
 		{
-		case IDM_EXIT:
-			DestroyWindow(hwnd);
-			break;
 		case IDM_SETTING:
 		{
 			if (settingDialog == NULL)
 			{
 				settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
-				DWORD style = GetWindowLong(settingDialog, GWL_STYLE); //get the b style
+				DWORD style = GetWindowLong(settingDialog, GWL_STYLE);
 				style |= WS_CHILD; //set the "child" bit
 				SetWindowLong(settingDialog, GWL_STYLE, style); //set the new style of b
-				RECT rcWindow; //temporary rectangle
-				RECT rcSetting;
-				GetClientRect(settingDialog, &rcSetting);
-				GetClientRect(window, &rcWindow); //the "inside border" rectangle for a
-				MoveWindow(settingDialog, rcWindow.right - rcSetting.right, 0, rcSetting.right, rcWindow.bottom, FALSE); //place b at (x,y,w,h) in a
-				UpdateWindow(window);
+				updateResolution();
+				ShowWindow(settingDialog, SW_NORMAL);
 			}
-			ShowWindow(settingDialog, SW_NORMAL);
+			else
+			{
+				EndDialog(settingDialog, LOWORD(wParam));
+				settingDialog = NULL;
+				updateResolution();
+			}
 		}
 		default:
 			return DefWindowProc(hwnd, Msg, wParam, lParam);
 		}
 		break;
-	case WM_MOUSEMOVE:
-		if (isLButtonDown) 
-		{
-			pt = MAKEPOINTS(lParam);
-
-			ORIGIN_POINT.x += pt.x - ptOld.x;
-			ORIGIN_POINT.y += pt.y - ptOld.y;
-
-			countRange();
-			invalidWindow(hwnd);
-			ptOld = pt;
-		}
-		if (!Tracking)
-		{
-			TrackMouse(hwnd);
-			Tracking = true;
-		}
-		break;
-	case WM_LBUTTONDOWN:
-		if (isLButtonDown == FALSE) {
-			//鼠标按下
-			SetCursor(hCursHand);
-			ptOld = MAKEPOINTS(lParam);
-			OutputDebugString(L"LButtonDown\n");
-		}
-		isLButtonDown = TRUE;
-		break;
-	case WM_LBUTTONUP:
-		if (isLButtonDown == TRUE) {
-			//鼠标松开
-			SetCursor(hCursArrow);
-			OutputDebugString(L"LButtonUp\n");
-		}
-		isLButtonDown = FALSE;
-		break;
-	case WM_MOUSELEAVE:
-		Tracking = FALSE;
-		if (isLButtonDown == TRUE) {
-			//鼠标离开窗口
-			SetCursor(hCursArrow);
-			OutputDebugString(L"MouseLeave\n");
-		}
-		isLButtonDown = FALSE;
-	case WM_MOUSEWHEEL:
-		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-		if (wheelDelta != 0)
-		{
-			pt = MAKEPOINTS(lParam);
-			POINT temp;
-			temp.x = pt.x;
-			temp.y = pt.y;
-			ScreenToClient(hwnd, &temp);
-			pt.x = temp.x;
-			pt.y = temp.y;
-
-			zoom(wheelDelta);
-			if (AUTO_MODE)
-			{
-				countRange();
-			}
-			else
-			{
-				countTickDistance();
-			}
-			invalidWindow(hwnd);
-		}
-		break;
-	case WM_RBUTTONDOWN:
-		//setXRange(-100, 100);
-		invalidWindow(hwnd);
-		//SetTimer(hwnd, TIMER_ZOOM, animVel, NULL);
-		//CaptureAnImage(hwnd);
-		break;
-	case WM_TIMER:
-		switch (wParam)
-		{
-			case TIMER_ZOOM:
-				animCur += animVel;
-				if (animCur < animTot)
-				{
-					zoom(120);
-					invalidWindow(hwnd);
-				}
-				else
-				{
-					KillTimer(hwnd, TIMER_ZOOM);
-					animCur = 0;
-				}
-				break;
-		}
-		break;
-	case WM_PAINT:
-		//双缓冲绘图
-
-		hdc = BeginPaint(hwnd, &ps);
-
-		hMemDC = CreateCompatibleDC(hdc);
-		hMemBM = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
-		hOld = SelectObject(hMemDC, hMemBM);
-
-
-		RECT rcClient;
-		GetClientRect(hwnd, &rcClient);
-		FillRect(hMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
-
-		onPaint();
-		BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, hMemDC, 0, 0, SRCCOPY);
-
-		SelectObject(hMemDC, hOld);
-		DeleteObject(hMemBM);
-		DeleteDC(hMemDC);
-
-		EndPaint(hwnd, &ps);
-
-		if (settingDialog != NULL)
-		{
-			updateUI(settingDialog);
-		}
-		break;
 	case WM_SIZE:
 		WINDOW_WIDTH = LOWORD(lParam);
 		WINDOW_HEIGHT = HIWORD(lParam);
-		countRange();
+		updateResolution();
 		break;
-	case WM_ERASEBKGND:
-		return 1;
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
 	default:
 		return ::DefWindowProc(hwnd, Msg, wParam, lParam);
 	}
@@ -888,10 +759,156 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
+//"函数"窗口的消息处理程序
+INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	int wmId, wmEvent;
+	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
+	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
+
+	INT wheelDelta;
+	std::wstring msg;
+
+	static bool Tracking = FALSE;
+
+	switch (message)
+	{
+	case WM_CREATE:
+		countRange();
+		break;
+	case WM_MOUSEMOVE:
+		if (isLButtonDown) 
+		{
+			pt = MAKEPOINTS(lParam);
+
+			ORIGIN_POINT.x += pt.x - ptOld.x;
+			ORIGIN_POINT.y += pt.y - ptOld.y;
+
+			countRange();
+			invalidWindow(hDlg);
+			ptOld = pt;
+		}
+		if (!Tracking)
+		{
+			TrackMouse(hDlg);
+			Tracking = true;
+		}
+		break;
+	case WM_LBUTTONDOWN:
+		if (isLButtonDown == FALSE) {
+			//鼠标按下
+			SetCursor(hCursHand);
+			ptOld = MAKEPOINTS(lParam);
+			OutputDebugString(L"LButtonDown\n");
+		}
+		isLButtonDown = TRUE;
+		break;
+	case WM_LBUTTONUP:
+		if (isLButtonDown == TRUE) {
+			//鼠标松开
+			SetCursor(hCursArrow);
+			OutputDebugString(L"LButtonUp\n");
+		}
+		isLButtonDown = FALSE;
+		break;
+	case WM_MOUSELEAVE:
+		Tracking = FALSE;
+		if (isLButtonDown == TRUE) {
+			//鼠标离开窗口
+			SetCursor(hCursArrow);
+			OutputDebugString(L"MouseLeave\n");
+		}
+		isLButtonDown = FALSE;
+	case WM_MOUSEWHEEL:
+		wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+		if (wheelDelta != 0)
+		{
+			pt = MAKEPOINTS(lParam);
+			POINT temp;
+			temp.x = pt.x;
+			temp.y = pt.y;
+			ScreenToClient(hDlg, &temp);
+			pt.x = temp.x;
+			pt.y = temp.y;
+
+			zoom(wheelDelta);
+			if (AUTO_MODE)
+			{
+				countRange();
+			}
+			else
+			{
+				countTickDistance();
+			}
+			invalidWindow(hDlg);
+		}
+		break;
+	case WM_RBUTTONDOWN:
+		invalidWindow(hDlg);
+		//CaptureAnImage(hwnd);
+		break;
+	case WM_TIMER:
+		switch (wParam)
+		{
+			case TIMER_ZOOM:
+				animCur += animVel;
+				if (animCur < animTot)
+				{
+					zoom(120);
+					invalidWindow(hDlg);
+				}
+				else
+				{
+					KillTimer(hDlg, TIMER_ZOOM);
+					animCur = 0;
+				}
+				break;
+		}
+		break;
+	case WM_PAINT:
+		//双缓冲绘图
+
+		hdc = BeginPaint(hDlg, &ps);
+
+		hMemDC = CreateCompatibleDC(hdc);
+		hMemBM = CreateCompatibleBitmap(hdc, FUNCTION_WIDTH, FUNCTION_HEIGHT);
+		hOld = SelectObject(hMemDC, hMemBM);
+
+		RECT rcClient;
+		GetClientRect(hDlg, &rcClient);
+		FillRect(hMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
+
+		onPaint();
+		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+
+		SelectObject(hMemDC, hOld);
+		DeleteObject(hMemBM);
+		DeleteDC(hMemDC);
+
+		EndPaint(hDlg, &ps);
+
+		if (settingDialog != NULL)
+		{
+			updateUI(settingDialog);
+		}
+		break;
+	case WM_SIZE:
+		FUNCTION_WIDTH = LOWORD(lParam);
+		FUNCTION_HEIGHT = HIWORD(lParam);
+		countRange();
+		break;
+	case WM_ERASEBKGND:
+		return 1;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
+	}
+
+	return (INT_PTR)FALSE;
+}
+
+
 // “设置”框的消息处理程序。
-
-
-
 HDC settingDC = NULL;
 HDC settingMemDC = NULL;
 HBITMAP settingMemBM = NULL;
@@ -938,16 +955,6 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
 		{
-		case IDOK:
-			EndDialog(hDlg, LOWORD(wParam));
-			settingDialog = NULL;
-			return (INT_PTR)TRUE;
-			break;
-		case IDCANCEL:
-			EndDialog(hDlg, LOWORD(wParam));
-			settingDialog = NULL;
-			return (INT_PTR)TRUE;
-			break;
 		case IDADDFUNCTION:
 		{
 			LPTSTR expression = new TCHAR[128];
@@ -1155,7 +1162,6 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 
-
 		break;
 	}
 	case WM_PAINT:
@@ -1224,4 +1230,35 @@ void updateUI(HWND hDlg)
 	{
 		CheckDlgButton(hDlg, IDC_AUTO_MODE, BST_UNCHECKED);
 	}
+}
+
+void updateResolution()
+{
+	RECT rcWindow; 
+	RECT rcSetting;
+	RECT rcFunction;
+
+	GetClientRect(window, &rcWindow);
+	if (settingDialog != NULL)
+	{
+		GetClientRect(settingDialog, &rcSetting);
+		FUNCTION_WIDTH = rcWindow.right - rcSetting.right;
+		FUNCTION_HEIGHT = rcWindow.bottom;
+
+		//设置框
+		MoveWindow(settingDialog, rcWindow.right - rcSetting.right, 0, rcSetting.right, rcWindow.bottom, FALSE); //place b at (x,y,w,h) in a
+		invalidWindow(settingDialog);
+		//函数框
+		MoveWindow(functionDialog, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, FALSE);
+		invalidWindow(functionDialog);
+	}
+	else
+	{
+		FUNCTION_WIDTH = rcWindow.right;
+		FUNCTION_HEIGHT = rcWindow.bottom;
+		//函数框
+		MoveWindow(functionDialog, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, FALSE);
+		invalidWindow(functionDialog);
+	}
+
 }
