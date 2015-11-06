@@ -668,6 +668,15 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			if (settingDialog == NULL)
 			{
 				settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
+				DWORD style = GetWindowLong(settingDialog, GWL_STYLE); //get the b style
+				style |= WS_CHILD; //set the "child" bit
+				SetWindowLong(settingDialog, GWL_STYLE, style); //set the new style of b
+				RECT rcWindow; //temporary rectangle
+				RECT rcSetting;
+				GetClientRect(settingDialog, &rcSetting);
+				GetClientRect(window, &rcWindow); //the "inside border" rectangle for a
+				MoveWindow(settingDialog, rcWindow.right - rcSetting.right, 0, rcSetting.right, rcWindow.bottom, FALSE); //place b at (x,y,w,h) in a
+				UpdateWindow(window);
 			}
 			ShowWindow(settingDialog, SW_NORMAL);
 		}
