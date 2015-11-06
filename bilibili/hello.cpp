@@ -1047,7 +1047,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				LPTSTR buffer = new TCHAR[128];
 				GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
-				X_TICK_DISTANCE = _wtof(buffer);
+				Y_TICK_DISTANCE = _wtof(buffer);
 				countTickSpace();
 				invalidWindow(window);
 				delete buffer;
