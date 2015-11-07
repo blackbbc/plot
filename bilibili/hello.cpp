@@ -780,20 +780,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
+HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
+HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 //"函数"窗口的消息处理程序
 INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int wmId, wmEvent;
-	HCURSOR hCursHand = LoadCursor(NULL, IDC_SIZEALL);
-	HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
-
-
 	static bool Tracking = FALSE;
 
 	switch (message)
 	{
 	case WM_CREATE:
 		countRange();
+		return (INT_PTR)TRUE;
 		break;
 	case WM_MOUSEMOVE:
 		if (isLButtonDown) 
@@ -813,7 +812,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			TrackMouse(hDlg);
 			Tracking = true;
 		}
-		break;
+		return (INT_PTR)TRUE;
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
 			//鼠标按下
@@ -821,7 +820,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			OutputDebugString(L"LButtonDown\n");
 		}
 		isLButtonDown = TRUE;
-		break;
+		return (INT_PTR)TRUE;
 	case WM_LBUTTONUP:
 		if (isLButtonDown == TRUE) {
 			//鼠标松开
@@ -829,7 +828,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			OutputDebugString(L"LButtonUp\n");
 		}
 		isLButtonDown = FALSE;
-		break;
+		return (INT_PTR)TRUE;
 	case WM_MOUSELEAVE:
 		Tracking = FALSE;
 		if (isLButtonDown == TRUE) {
@@ -838,31 +837,13 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			OutputDebugString(L"MouseLeave\n");
 		}
 		isLButtonDown = FALSE;
+		return (INT_PTR)TRUE;
 	case WM_RBUTTONDOWN:
 		invalidWindow(hDlg);
 		//CaptureAnImage(hwnd);
-		break;
-	case WM_TIMER:
-		switch (wParam)
-		{
-			case TIMER_ZOOM:
-				animCur += animVel;
-				if (animCur < animTot)
-				{
-					zoom(120);
-					invalidWindow(hDlg);
-				}
-				else
-				{
-					KillTimer(hDlg, TIMER_ZOOM);
-					animCur = 0;
-				}
-				break;
-		}
-		break;
+		return (INT_PTR)TRUE;
 	case WM_PAINT:
 		//双缓冲绘图
-
 		hdc = BeginPaint(hDlg, &ps);
 
 		hMemDC = CreateCompatibleDC(hdc);
@@ -886,12 +867,12 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			updateUI(settingDialog);
 		}
-		break;
+		return (INT_PTR)TRUE;
 	case WM_SIZE:
 		FUNCTION_WIDTH = LOWORD(lParam);
 		FUNCTION_HEIGHT = HIWORD(lParam);
 		countRange();
-		break;
+		return (INT_PTR)TRUE;
 	case WM_ERASEBKGND:
 		return 1;
 	case WM_DESTROY:
@@ -970,14 +951,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				ListView_InsertItem(listView, &vitem);
 
 				numFuncs++;
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 			}
 			else
 			{
 				MessageBox(settingDialog, L"函数不能为空", NULL, NULL);
 			}
 			delete expression;
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDDELETEFUNCTION:
 		{
@@ -987,9 +968,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				ListView_DeleteItem(listView, iPos);
 				numFuncs--;
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		//检测用户输入
 		case IDC_X_RANGE_LEFT:
@@ -1000,10 +981,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
 				X_RANGE_LEFT = _wtof(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_X_RANGE_RIGHT:
 		{
@@ -1013,10 +994,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
 				X_RANGE_RIGHT = _wtof(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_Y_RANGE_LEFT:
 		{
@@ -1026,10 +1007,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
 				Y_RANGE_LEFT = _wtof(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_Y_RANGE_RIGHT:
 		{
@@ -1039,10 +1020,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
 				Y_RANGE_RIGHT = _wtof(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_X_TICK_DISTANCE:
 		{
@@ -1052,10 +1033,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, buffer, 128);
 				X_TICK_DISTANCE = _wtof(buffer);
 				countTickSpace();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_Y_TICK_DISTANCE:
 		{
@@ -1065,10 +1046,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
 				Y_TICK_DISTANCE = _wtof(buffer);
 				countTickSpace();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_X_TICK_LABEL:
 		{
@@ -1077,10 +1058,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				LPTSTR buffer = new TCHAR[128];
 				GetDlgItemText(hDlg, IDC_X_TICK_LABEL, buffer, 128);
 				X_TICK_LABEL = _wtoi(buffer);
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_Y_TICK_LABEL:
 		{
@@ -1089,10 +1070,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				LPTSTR buffer = new TCHAR[128];
 				GetDlgItemText(hDlg, IDC_Y_TICK_LABEL, buffer, 128);
 				Y_TICK_LABEL = _wtoi(buffer);
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_X_TICK_PIXEL:
 		{
@@ -1102,10 +1083,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
 				X_TICK_PIXEL = _wtoi(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_Y_TICK_PIXEL:
 		{
@@ -1115,10 +1096,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
 				Y_TICK_PIXEL = _wtoi(buffer);
 				countTickDistance();
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 				delete buffer;
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_SHOW_GRID:
 		{
@@ -1133,9 +1114,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					SHOW_GRID = FALSE;
 				}
 				updateUI(settingDialog);
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		case IDC_AUTO_MODE:
 		{
@@ -1150,14 +1131,13 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					AUTO_MODE = FALSE;
 				}
 				updateUI(settingDialog);
-				invalidWindow(window);
+				invalidWindow(functionDialog);
 			}
-			break;
+			return (INT_PTR)TRUE;
 		}
 		default:
 			break;
 		}
-
 		break;
 	}
 	case WM_PAINT:
@@ -1188,7 +1168,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteDC(settingMemDC);
 
 		EndPaint(hDlg, &ps);
-		break;
+		return (INT_PTR)TRUE;
+	case WM_ERASEBKGND:
+		return 1;
 	}
 	return (INT_PTR)FALSE;
 }
