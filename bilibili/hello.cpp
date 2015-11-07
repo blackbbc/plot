@@ -27,8 +27,6 @@ HINSTANCE mHinstance;
 
 BOOLEAN isLButtonDown;
 
-//FunctionHelper funcHelper("x^2");
-
 FunctionHelper funcs[100];
 INT numFuncs = 0;
 
@@ -673,6 +671,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 				settingDialog = NULL;
 				updateResolution();
 			}
+			break;
 		}
 		default:
 			return DefWindowProc(hwnd, Msg, wParam, lParam);
@@ -726,7 +725,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg) || !IsDialogMessage(functionDialog, &msg))
+		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
