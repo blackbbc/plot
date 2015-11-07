@@ -798,6 +798,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		if (isLButtonDown) 
 		{
+			SetCursor(hCursHand);
 			pt = MAKEPOINTS(lParam);
 
 			ORIGIN_POINT.x += pt.x - ptOld.x;
@@ -816,7 +817,6 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
 			//Êó±ê°´ÏÂ
-			SetCursor(hCursHand);
 			ptOld = MAKEPOINTS(lParam);
 			OutputDebugString(L"LButtonDown\n");
 		}
