@@ -402,29 +402,15 @@ void setYRange(DOUBLE left, DOUBLE right)
 
 void zoom(INT wheelDelta)
 {
-	DOUBLE xDelta, yDelta, zDelta, xRaw, yRaw, zRaw;
-	INT zoomCoefficient = 10;
+	//按照鼠标中心进行缩放
+	DOUBLE x, y;
 
-	//以45°进行缩放
-	xDelta = ORIGIN_POINT.x - pt.x;
-	yDelta = ORIGIN_POINT.y - pt.y;
-	xRaw = xDelta;
-	yRaw = yDelta;
-	zRaw = xDelta * xDelta + yDelta * yDelta;
-	xDelta = xDelta == 0 ? 0 : xDelta > 0 ? 1 : -1;
-	yDelta = yDelta == 0 ? 0 : yDelta > 0 ? 1 : -1;
-
-	zDelta = sqrt((pow(xDelta, 2), pow(yDelta, 2)));
+	//首先获取原函数值
+	x = getXRangeLength() / FUNCTION_WIDTH * (pt.x - ORIGIN_POINT.x);
+	y = getYRangeLength() / FUNCTION_HEIGHT * (pt.y - ORIGIN_POINT.y);
 
 	if (wheelDelta > 0)
 	{
-		//Zoom In
-		if (zDelta > 0)
-		{
-			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
-			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
-		}
-
 		if (AUTO_MODE)
 		{
 			PIXEL_ROUND = PIXEL_ROUND - 1;
@@ -451,17 +437,15 @@ void zoom(INT wheelDelta)
 			Y_RANGE_LEFT /= 2;
 			Y_RANGE_RIGHT /= 2;
 		}
+
+		//计算新的原点的位置
+		ORIGIN_POINT.x = pt.x - (x * X_TICK_PIXEL / X_TICK_DISTANCE);
+		ORIGIN_POINT.y = pt.y - (y * Y_TICK_PIXEL / Y_TICK_DISTANCE);
+
 	}
 	else
 	{
 		//Zoom Out
-		zoomCoefficient = -zoomCoefficient;
-		if (zDelta > 0 && zRaw > 65)
-		{
-			ORIGIN_POINT.x += zoomCoefficient * xDelta / zDelta;
-			ORIGIN_POINT.y += zoomCoefficient * yDelta / zDelta;
-		}
-
 		if (AUTO_MODE)
 		{
 			PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
@@ -486,9 +470,9 @@ void zoom(INT wheelDelta)
 			Y_RANGE_LEFT *= 2;
 			Y_RANGE_RIGHT *= 2;
 		}
-
+		ORIGIN_POINT.x = pt.x - (x * X_TICK_PIXEL / X_TICK_DISTANCE);
+		ORIGIN_POINT.y = pt.y - (y * Y_TICK_PIXEL / Y_TICK_DISTANCE);
 	}
-	
 }
 
 int CaptureAnImage(HWND hWnd)
