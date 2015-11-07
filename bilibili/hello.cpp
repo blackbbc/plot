@@ -21,6 +21,8 @@ PAINTSTRUCT ps;
 
 HPEN hpen;
 HPEN hpenOld;
+HBRUSH hbrush;
+HBRUSH hbrushOld;
 
 HANDLE hOld;
 HINSTANCE mHinstance;
@@ -1152,18 +1154,23 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		FillRect(settingMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
 
 		//开始作图
-		//MoveToEx(settingMemDC, 10, 10, NULL);
-		//LineTo(settingMemDC, 100, 100);
 
+		//选择颜色
+		hbrush = CreateSolidBrush(RGB(255, 0, 0));
+		hbrushOld = (HBRUSH)SelectObject(settingMemDC, hbrush);
 		//画一个矩形表示背景颜色
+		Rectangle(settingMemDC, 105, 542, 125, 560);
 
 		//画一个线条表示函数颜色
+		Rectangle(settingMemDC, 98, 367, 130, 373);
 
 		//作图结束
 
 		BitBlt(settingDC, 0, 0, rcClient.right, rcClient.bottom, settingMemDC, 0, 0, SRCCOPY);
 
+		SelectObject(settingMemDC, hbrushOld);
 		SelectObject(settingMemDC, hOld);
+		DeleteObject(hbrush);
 		DeleteObject(settingMemBM);
 		DeleteDC(settingMemDC);
 
