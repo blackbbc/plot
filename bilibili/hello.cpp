@@ -664,9 +664,6 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			if (settingDialog == NULL)
 			{
 				settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
-				DWORD style = GetWindowLong(settingDialog, GWL_STYLE);
-				style |= WS_CHILD; //set the "child" bit
-				SetWindowLong(settingDialog, GWL_STYLE, style); //set the new style of b
 				updateResolution();
 				ShowWindow(settingDialog, SW_NORMAL);
 			}
@@ -952,6 +949,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
+
 		switch (wmId)
 		{
 		case IDADDFUNCTION:
