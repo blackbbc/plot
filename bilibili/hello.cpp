@@ -839,7 +839,9 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		RECT rcClient;
 		GetClientRect(hDlg, &rcClient);
-		FillRect(hMemDC, &rcClient, (HBRUSH)(COLOR_WINDOW));
+
+		hbrush = CreateSolidBrush(BACKGROUND_COLOR);
+		FillRect(hMemDC, &rcClient, hbrush);
 
 		onPaint();
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
@@ -996,6 +998,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			if (ChooseColor(&cc) == TRUE)
 			{
 				BACKGROUND_COLOR = cc.rgbResult;
+				hdc = GetDC(functionDialog);
+				invalidWindow(settingDialog);
+				invalidWindow(functionDialog);
 			}
 			return (INT_PTR)TRUE;
 		}
@@ -1181,11 +1186,13 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		//开始作图
 
 		//选择颜色
-		hbrush = CreateSolidBrush(RGB(255, 0, 0));
+		hbrush = CreateSolidBrush(BACKGROUND_COLOR);
 		hbrushOld = (HBRUSH)SelectObject(settingMemDC, hbrush);
 		//画一个矩形表示背景颜色
 		Rectangle(settingMemDC, 105, 542, 125, 560);
 
+		hbrush = CreateSolidBrush(FUNCTION_COLOR);
+		SelectObject(settingMemDC, hbrush);
 		//画一个线条表示函数颜色
 		Rectangle(settingMemDC, 98, 368, 130, 373);
 
