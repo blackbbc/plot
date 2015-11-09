@@ -4,6 +4,9 @@
 #include <vector>
 #include <map>
 
+extern DWORD BACKGROUND_COLOR;
+extern DWORD FUNCTION_COLOR;
+
 extern INT WINDOW_WIDTH;
 extern INT WINDOW_HEIGHT;
 extern INT SETTING_WIDTH;

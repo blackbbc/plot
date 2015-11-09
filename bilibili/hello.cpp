@@ -4,6 +4,7 @@
 #include <vector>
 #include <chrono>
 #include <CommCtrl.h>
+#include <commdlg.h>
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
@@ -120,9 +121,10 @@ void countTickDistance()
 	ORIGIN_POINT.x = FUNCTION_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
 	ORIGIN_POINT.y = FUNCTION_HEIGHT - FUNCTION_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
 
+	//选择一个合适的tick
 	//计算Tick距离
-	X_TICK_DISTANCE = getXRangeLength() / FUNCTION_WIDTH * X_TICK_PIXEL;
-	Y_TICK_DISTANCE = getYRangeLength() / FUNCTION_HEIGHT * Y_TICK_PIXEL;
+	//X_TICK_DISTANCE = getXRangeLength() / FUNCTION_WIDTH * X_TICK_PIXEL;
+	//Y_TICK_DISTANCE = getYRangeLength() / FUNCTION_HEIGHT * Y_TICK_PIXEL;
 }
 
 void drawCoordinate()
@@ -771,7 +773,6 @@ HCURSOR hCursArrow = LoadCursor(NULL, IDC_ARROW);
 //"函数"窗口的消息处理程序
 INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int wmId, wmEvent;
 	static bool Tracking = FALSE;
 
 	switch (message)
@@ -955,6 +956,46 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				ListView_DeleteItem(listView, iPos);
 				numFuncs--;
 				invalidWindow(functionDialog);
+			}
+			return (INT_PTR)TRUE;
+		}
+		//函数颜色
+		case IDFUNCTIONCOLOR:
+		{
+			CHOOSECOLOR cc;                 // common dialog box structure  
+			static COLORREF acrCustClr[16]; // array of custom colors  
+
+			// Initialize CHOOSECOLOR  
+			ZeroMemory(&cc, sizeof(cc));
+			cc.lStructSize = sizeof(cc);
+			cc.hwndOwner = hDlg;
+			cc.lpCustColors = (LPDWORD)acrCustClr;
+			cc.rgbResult = FUNCTION_COLOR;
+			cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+			if (ChooseColor(&cc) == TRUE)
+			{
+				FUNCTION_COLOR = cc.rgbResult;
+			}
+			return (INT_PTR)TRUE;
+		}
+		//背景颜色
+		case IDBACKGROUNDCOLOR:
+		{
+			CHOOSECOLOR cc;                 // common dialog box structure  
+			static COLORREF acrCustClr[16]; // array of custom colors  
+
+			// Initialize CHOOSECOLOR  
+			ZeroMemory(&cc, sizeof(cc));
+			cc.lStructSize = sizeof(cc);
+			cc.hwndOwner = hDlg;
+			cc.lpCustColors = (LPDWORD)acrCustClr;
+			cc.rgbResult = BACKGROUND_COLOR;
+			cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+			if (ChooseColor(&cc) == TRUE)
+			{
+				BACKGROUND_COLOR = cc.rgbResult;
 			}
 			return (INT_PTR)TRUE;
 		}
@@ -1146,10 +1187,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		Rectangle(settingMemDC, 105, 542, 125, 560);
 
 		//画一个线条表示函数颜色
-		Rectangle(settingMemDC, 98, 367, 130, 373);
+		Rectangle(settingMemDC, 98, 368, 130, 373);
 
 		//作图结束
-
 		BitBlt(settingDC, 0, 0, rcClient.right, rcClient.bottom, settingMemDC, 0, 0, SRCCOPY);
 
 		SelectObject(settingMemDC, hbrushOld);
