@@ -842,6 +842,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		hbrush = CreateSolidBrush(BACKGROUND_COLOR);
 		FillRect(hMemDC, &rcClient, hbrush);
+		DeleteObject(hbrush);
 
 		onPaint();
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
@@ -928,7 +929,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if (expression[0] != 0)
 			{
-				funcs[numFuncs] = FunctionHelper(expression);
+				funcs[numFuncs] = FunctionHelper(expression, FUNCTION_COLOR);
 
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
 				LVITEM vitem;
@@ -978,6 +979,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			if (ChooseColor(&cc) == TRUE)
 			{
 				FUNCTION_COLOR = cc.rgbResult;
+				invalidWindow(settingDialog);
 			}
 			return (INT_PTR)TRUE;
 		}
@@ -998,7 +1000,6 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			if (ChooseColor(&cc) == TRUE)
 			{
 				BACKGROUND_COLOR = cc.rgbResult;
-				hdc = GetDC(functionDialog);
 				invalidWindow(settingDialog);
 				invalidWindow(functionDialog);
 			}

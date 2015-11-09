@@ -7,10 +7,11 @@ FunctionHelper::FunctionHelper()
 
 }
 
-FunctionHelper::FunctionHelper (LPTSTR func)
+FunctionHelper::FunctionHelper (LPTSTR func, DWORD color)
 {
 	initialParser();
 	this->_raw = func;
+	this->_color = color;
 
 	char *buffer = new char[128];
 	wcstombs(buffer, func, 128);
@@ -63,6 +64,12 @@ void FunctionHelper::draw(HDC &hdc)
 	updateXVec();
 	updateYVec();
 
+	HPEN hpen;
+	HPEN hpenOld;
+
+	hpen = CreatePen(PS_SOLID, 2, _color);
+	hpenOld = (HPEN)SelectObject(hdc, hpen);
+
 	for (i = 0; i < FUNCTION_WIDTH; i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
@@ -85,4 +92,8 @@ void FunctionHelper::draw(HDC &hdc)
 			LineTo(hdc, (INT)(FUNCTION_WIDTH * percentX), (INT)(FUNCTION_HEIGHT * percentY));
 		}
 	}
+
+	SelectObject(hdc, hpenOld);
+	DeleteObject(hpenOld);
+	DeleteObject(hpen);
 }
