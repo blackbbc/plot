@@ -970,6 +970,9 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		// 设置ListView的列  
 		HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+
+		SendMessage(listView, LVM_SETEXTENDEDLISTVIEWSTYLE, 0, LVS_EX_FULLROWSELECT); // Set style
+
 		LVCOLUMN vcl;
 		vcl.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
 		// 第一列  
