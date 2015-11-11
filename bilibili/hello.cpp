@@ -1271,6 +1271,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+		break;
 	}
 	case WM_PAINT:
 		settingDC = BeginPaint(hDlg, &settingPs);
