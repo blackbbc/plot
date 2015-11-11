@@ -1223,6 +1223,29 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	}
+	case WM_CONTEXTMENU:
+	{
+		//加载菜单资源  
+		HMENU hroot = LoadMenu((HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE), MAKEINTRESOURCE(IDR_LISTVIEW_CONTEXT_MENU));
+		if (hroot)
+		{
+			// 获取第一个弹出菜单  
+			HMENU hpop = GetSubMenu(hroot, 0);
+			// 获取鼠标右击是的坐标  
+			pt = MAKEPOINTS(lParam);
+			//显示快捷菜单  
+			TrackPopupMenu(hpop,
+				TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON,
+				pt.x,
+				pt.y,
+				0,
+				(HWND)wParam,
+				NULL);
+			// 用完后要销毁菜单资源  
+			DestroyMenu(hroot);
+		}
+		return (INT_PTR)TRUE;
+	}
 	case WM_PAINT:
 		settingDC = BeginPaint(hDlg, &settingPs);
 
