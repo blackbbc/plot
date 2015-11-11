@@ -8,13 +8,14 @@
 class FunctionHelper
 {
 private:
-	DWORD _color;
 	char *_func;
 	LPTSTR _raw;
 	std::vector<Token> _rpn;
 	double xVec[3000];
 	double yVec[3000];
 public:
+	DWORD _color;
+
 	FunctionHelper::FunctionHelper();
 	FunctionHelper::FunctionHelper(LPTSTR func, DWORD color = RGB(0, 0, 0));
 
