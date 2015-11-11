@@ -1214,10 +1214,17 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				LPNMLISTVIEW pnm = (LPNMLISTVIEW)lParam;
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-				if (pnm->hdr.hwndFrom == listView && pnm->hdr.code == NM_CUSTOMDRAW)
+				switch (pnm->hdr.code)
 				{
-					SetWindowLong(hDlg, DWLP_MSGRESULT, (LONG)ProcessCustomDraw(lParam));
-					return TRUE;
+					case NM_CUSTOMDRAW:
+						SetWindowLong(hDlg, DWLP_MSGRESULT, (LONG)ProcessCustomDraw(lParam));
+						return TRUE;
+					case LVN_ENDLABELEDIT:
+					{
+						DebugOut() << "HHH";
+						LPNMLVDISPINFOA pdi = (LPNMLVDISPINFOA)lParam;
+						return TRUE;
+					}
 				}
 			}
 		}
@@ -1229,20 +1236,27 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		HMENU hroot = LoadMenu((HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE), MAKEINTRESOURCE(IDR_LISTVIEW_CONTEXT_MENU));
 		if (hroot)
 		{
-			// 获取第一个弹出菜单  
-			HMENU hpop = GetSubMenu(hroot, 0);
-			// 获取鼠标右击是的坐标  
+			// 获取鼠标右击时的坐标  
 			pt = MAKEPOINTS(lParam);
-			//显示快捷菜单  
-			TrackPopupMenu(hpop,
-				TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON,
-				pt.x,
-				pt.y,
-				0,
-				(HWND)wParam,
-				NULL);
-			// 用完后要销毁菜单资源  
-			DestroyMenu(hroot);
+
+			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+			int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+
+			if (iPos >= 0)
+			{
+				// 获取第一个弹出菜单  
+				HMENU hpop = GetSubMenu(hroot, 0);
+				//显示快捷菜单  
+				TrackPopupMenu(hpop,
+					TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RIGHTBUTTON,
+					pt.x,
+					pt.y,
+					0,
+					(HWND)wParam,
+					NULL);
+				// 用完后要销毁菜单资源  
+				DestroyMenu(hroot);
+			}
 		}
 		return (INT_PTR)TRUE;
 	}
