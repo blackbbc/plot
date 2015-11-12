@@ -676,24 +676,22 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
 		{
-		case IDM_SETTING:
-		{
-			if (settingDialog == NULL)
+			case IDM_SETTING:
 			{
-				settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
-				updateResolution();
-				ShowWindow(settingDialog, SW_NORMAL);
+				if (settingDialog == NULL)
+				{
+					settingDialog = CreateDialog(mHinstance, MAKEINTRESOURCE(IDD_SETTING), hwnd, Setting);
+					updateResolution();
+					ShowWindow(settingDialog, SW_NORMAL);
+				}
+				else
+				{
+					EndDialog(settingDialog, LOWORD(wParam));
+					settingDialog = NULL;
+					updateResolution();
+				}
+				break;
 			}
-			else
-			{
-				EndDialog(settingDialog, LOWORD(wParam));
-				settingDialog = NULL;
-				updateResolution();
-			}
-			break;
-		}
-		default:
-			return DefWindowProc(hwnd, Msg, wParam, lParam);
 		}
 		break;
 	case WM_MOUSEWHEEL:
@@ -708,16 +706,21 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			pt.x = temp.x;
 			pt.y = temp.y;
 
-			zoom(wheelDelta);
-			if (AUTO_MODE)
+			RECT rcClient;
+			GetClientRect(functionDialog, &rcClient);
+			if (PtInRect(&rcClient, temp))
 			{
-				countRange();
+				zoom(wheelDelta);
+				if (AUTO_MODE)
+				{
+					countRange();
+				}
+				else
+				{
+					countTickDistance();
+				}
+				invalidWindow(functionDialog);
 			}
-			else
-			{
-				countTickDistance();
-			}
-			invalidWindow(functionDialog);
 		}
 		break;
 	case WM_SIZE:
@@ -728,8 +731,6 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	default:
 		return ::DefWindowProc(hwnd, Msg, wParam, lParam);
 	}
-
-	return 0;
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -811,8 +812,8 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		countRange();
 		return (INT_PTR)TRUE;
-		break;
 	case WM_MOUSEMOVE:
+		SetFocus(hDlg);
 		if (isLButtonDown) 
 		{
 			SetCursor(hCursHand);
@@ -1221,7 +1222,6 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 						return TRUE;
 					case LVN_ENDLABELEDIT:
 					{
-						//To do
 						LPNMLVDISPINFOW pdi = (LPNMLVDISPINFOW)lParam;
 						if (pdi->item.pszText != NULL)
 						{
@@ -1243,7 +1243,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
-		break;
+		return (INT_PTR)TRUE;
 	}
 	case WM_CONTEXTMENU:
 	{
