@@ -73,7 +73,7 @@ LRESULT ProcessCustomDraw(LPARAM lParam)
 			if (lplvcd->iSubItem == 1)
 			{
 				//只画第二列（颜色）
-				lplvcd->clrTextBk = funcs[lplvcd->nmcd.dwItemSpec]._color;
+				lplvcd->clrTextBk = funcs[lplvcd->nmcd.dwItemSpec].getColor();
 				return CDRF_NEWFONT;
 			}
 			break;
@@ -941,7 +941,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		vitem.mask = LVIF_TEXT;
 		for (int i = 0; i < numFuncs; i++)
 		{
-			vitem.pszText = funcs[i].getFunc();
+			vitem.pszText = (LPTSTR)funcs[i].getFunc();
 			vitem.iItem = i;
 			vitem.iSubItem = 0;
 			ListView_InsertItem(listView, &vitem);
@@ -1221,8 +1221,23 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 						return TRUE;
 					case LVN_ENDLABELEDIT:
 					{
-						DebugOut() << "HHH";
-						LPNMLVDISPINFOA pdi = (LPNMLVDISPINFOA)lParam;
+						//To do
+						LPNMLVDISPINFOW pdi = (LPNMLVDISPINFOW)lParam;
+						if (pdi->item.pszText != NULL)
+						{
+							funcs[pdi->item.iItem].setFunc((LPTSTR)(pdi->item.pszText));
+
+							HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+							LVITEM vitem;
+							vitem.mask = LVIF_TEXT;
+
+							vitem.pszText = (LPTSTR)pdi->item.pszText;
+							vitem.iItem = pdi->item.iItem;
+							vitem.iSubItem = 0;
+							ListView_SetItem(listView, &vitem);
+
+							invalidWindow(functionDialog);
+						}
 						return TRUE;
 					}
 				}

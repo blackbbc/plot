@@ -7,14 +7,15 @@ FunctionHelper::FunctionHelper()
 
 }
 
-FunctionHelper::FunctionHelper (LPTSTR func, DWORD color)
+FunctionHelper::FunctionHelper (LPTSTR raw, DWORD color)
 {
 	initialParser();
-	this->_raw = func;
+	this->_raw = new TCHAR[128];
+	wcscpy(this->_raw, raw);
 	this->_color = color;
 
 	char *buffer = new char[128];
-	wcstombs(buffer, func, 128);
+	wcstombs(buffer, raw, 128);
 
 	this->_func = preProcessing(buffer);
 	this->_rpn = getRPN(this->_func);
@@ -41,16 +42,36 @@ void FunctionHelper::updateYVec()
 	}
 }
 
-DOUBLE FunctionHelper::getY(DOUBLE x)
+void FunctionHelper::setColor(DWORD color)
 {
-	return countexp(this->_rpn, x);
+	_color = color;
 }
 
+DWORD FunctionHelper::getColor()
+{
+	return _color;
+}
+
+void FunctionHelper::setFunc(LPTSTR raw)
+{
+	wcscpy(this->_raw, raw);
+	char *buffer = new char[128];
+	wcstombs(buffer, raw, 128);
+
+	this->_func = preProcessing(buffer);
+	this->_rpn = getRPN(this->_func);
+}
 
 LPTSTR FunctionHelper::getFunc()
 {
 	return this->_raw;
 }
+
+DOUBLE FunctionHelper::getY(DOUBLE x)
+{
+	return countexp(this->_rpn, x);
+}
+
 
 void FunctionHelper::draw(HDC &hdc)
 {
