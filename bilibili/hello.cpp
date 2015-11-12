@@ -744,11 +744,11 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg))
-		{
+		//if (settingDialog == NULL || !IsDialogMessage(settingDialog, &msg))
+		//{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-		}
+		//}
 	}
 
 	return 0;
@@ -957,254 +957,254 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		switch (wmId)
 		{
-		case IDADDFUNCTION:
-		{
-			LPTSTR expression = new TCHAR[128];
-			GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
-
-			if (expression[0] != 0)
+			case IDADDFUNCTION:
 			{
-				funcs[numFuncs] = FunctionHelper(expression, FUNCTION_COLOR);
+				LPTSTR expression = new TCHAR[128];
+				GetDlgItemText(hDlg, IDC_FUNCTION_EXPRESSION, expression, 128);
 
+				if (expression[0] != 0)
+				{
+					funcs[numFuncs] = FunctionHelper(expression, FUNCTION_COLOR);
+
+					HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+					LVITEM vitem;
+					vitem.mask = LVIF_TEXT;
+
+					vitem.pszText = expression;
+					vitem.iItem = numFuncs;
+					vitem.iSubItem = 0;
+					ListView_InsertItem(listView, &vitem);
+
+					numFuncs++;
+					invalidWindow(functionDialog);
+				}
+				else
+				{
+					MessageBox(settingDialog, L"函数不能为空", NULL, NULL);
+				}
+				delete expression;
+				return (INT_PTR)TRUE;
+			}
+			case IDDELETEFUNCTION:
+			{
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-				LVITEM vitem;
-				vitem.mask = LVIF_TEXT;
-
-				vitem.pszText = expression;
-				vitem.iItem = numFuncs;
-				vitem.iSubItem = 0;
-				ListView_InsertItem(listView, &vitem);
-
-				numFuncs++;
-				invalidWindow(functionDialog);
-			}
-			else
-			{
-				MessageBox(settingDialog, L"函数不能为空", NULL, NULL);
-			}
-			delete expression;
-			return (INT_PTR)TRUE;
-		}
-		case IDDELETEFUNCTION:
-		{
-			HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-			int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
-			if (iPos != -1)
-			{
-				ListView_DeleteItem(listView, iPos);
-				numFuncs--;
-				invalidWindow(functionDialog);
-			}
-			return (INT_PTR)TRUE;
-		}
-		//函数颜色
-		case IDFUNCTIONCOLOR:
-		{
-			CHOOSECOLOR cc;                 // common dialog box structure  
-			static COLORREF acrCustClr[16]; // array of custom colors  
-
-			// Initialize CHOOSECOLOR  
-			ZeroMemory(&cc, sizeof(cc));
-			cc.lStructSize = sizeof(cc);
-			cc.hwndOwner = hDlg;
-			cc.lpCustColors = (LPDWORD)acrCustClr;
-			cc.rgbResult = FUNCTION_COLOR;
-			cc.Flags = CC_FULLOPEN | CC_RGBINIT;
-
-			if (ChooseColor(&cc) == TRUE)
-			{
-				FUNCTION_COLOR = cc.rgbResult;
-				invalidWindow(settingDialog);
-			}
-			return (INT_PTR)TRUE;
-		}
-		//背景颜色
-		case IDBACKGROUNDCOLOR:
-		{
-			CHOOSECOLOR cc;                 // common dialog box structure  
-			static COLORREF acrCustClr[16]; // array of custom colors  
-
-			// Initialize CHOOSECOLOR  
-			ZeroMemory(&cc, sizeof(cc));
-			cc.lStructSize = sizeof(cc);
-			cc.hwndOwner = hDlg;
-			cc.lpCustColors = (LPDWORD)acrCustClr;
-			cc.rgbResult = BACKGROUND_COLOR;
-			cc.Flags = CC_FULLOPEN | CC_RGBINIT;
-
-			if (ChooseColor(&cc) == TRUE)
-			{
-				BACKGROUND_COLOR = cc.rgbResult;
-				invalidWindow(settingDialog);
-				invalidWindow(functionDialog);
-			}
-			return (INT_PTR)TRUE;
-		}
-		//检测用户输入
-		case IDC_X_RANGE_LEFT:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
-				X_RANGE_LEFT = _wtof(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_X_RANGE_RIGHT:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
-				X_RANGE_RIGHT = _wtof(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_Y_RANGE_LEFT:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
-				Y_RANGE_LEFT = _wtof(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_Y_RANGE_RIGHT:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
-				Y_RANGE_RIGHT = _wtof(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_X_TICK_DISTANCE:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, buffer, 128);
-				X_TICK_DISTANCE = _wtof(buffer);
-				countTickSpace();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_Y_TICK_DISTANCE:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
-				Y_TICK_DISTANCE = _wtof(buffer);
-				countTickSpace();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_X_TICK_LABEL:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_X_TICK_LABEL, buffer, 128);
-				X_TICK_LABEL = _wtoi(buffer);
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_Y_TICK_LABEL:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_Y_TICK_LABEL, buffer, 128);
-				Y_TICK_LABEL = _wtoi(buffer);
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_X_TICK_PIXEL:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
-				X_TICK_PIXEL = _wtoi(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_Y_TICK_PIXEL:
-		{
-			if (wmEvent == EN_KILLFOCUS)
-			{
-				LPTSTR buffer = new TCHAR[128];
-				GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
-				Y_TICK_PIXEL = _wtoi(buffer);
-				countTickDistance();
-				invalidWindow(functionDialog);
-				delete buffer;
-			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_SHOW_GRID:
-		{
-			if (wmEvent == BN_CLICKED)
-			{
-				if (IsDlgButtonChecked(settingDialog, IDC_SHOW_GRID) == BST_CHECKED)
+				int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+				if (iPos != -1)
 				{
-					SHOW_GRID = TRUE;
+					ListView_DeleteItem(listView, iPos);
+					numFuncs--;
+					invalidWindow(functionDialog);
 				}
-				else
-				{
-					SHOW_GRID = FALSE;
-				}
-				updateUI(settingDialog);
-				invalidWindow(functionDialog);
+				return (INT_PTR)TRUE;
 			}
-			return (INT_PTR)TRUE;
-		}
-		case IDC_AUTO_MODE:
-		{
-			if (wmEvent == BN_CLICKED)
+			//函数颜色
+			case IDFUNCTIONCOLOR:
 			{
-				if (IsDlgButtonChecked(settingDialog, IDC_AUTO_MODE) == BST_CHECKED)
+				CHOOSECOLOR cc;                 // common dialog box structure  
+				static COLORREF acrCustClr[16]; // array of custom colors  
+
+				// Initialize CHOOSECOLOR  
+				ZeroMemory(&cc, sizeof(cc));
+				cc.lStructSize = sizeof(cc);
+				cc.hwndOwner = hDlg;
+				cc.lpCustColors = (LPDWORD)acrCustClr;
+				cc.rgbResult = FUNCTION_COLOR;
+				cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+				if (ChooseColor(&cc) == TRUE)
 				{
-					AUTO_MODE = TRUE;
+					FUNCTION_COLOR = cc.rgbResult;
+					invalidWindow(settingDialog);
 				}
-				else
-				{
-					AUTO_MODE = FALSE;
-				}
-				updateUI(settingDialog);
-				invalidWindow(functionDialog);
+				return (INT_PTR)TRUE;
 			}
-			return (INT_PTR)TRUE;
+			//背景颜色
+			case IDBACKGROUNDCOLOR:
+			{
+				CHOOSECOLOR cc;                 // common dialog box structure  
+				static COLORREF acrCustClr[16]; // array of custom colors  
+
+				// Initialize CHOOSECOLOR  
+				ZeroMemory(&cc, sizeof(cc));
+				cc.lStructSize = sizeof(cc);
+				cc.hwndOwner = hDlg;
+				cc.lpCustColors = (LPDWORD)acrCustClr;
+				cc.rgbResult = BACKGROUND_COLOR;
+				cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+				if (ChooseColor(&cc) == TRUE)
+				{
+					BACKGROUND_COLOR = cc.rgbResult;
+					invalidWindow(settingDialog);
+					invalidWindow(functionDialog);
+				}
+				return (INT_PTR)TRUE;
+			}
+			//检测用户输入
+			case IDC_X_RANGE_LEFT:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
+					X_RANGE_LEFT = _wtof(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_X_RANGE_RIGHT:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
+					X_RANGE_RIGHT = _wtof(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_Y_RANGE_LEFT:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
+					Y_RANGE_LEFT = _wtof(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_Y_RANGE_RIGHT:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
+					Y_RANGE_RIGHT = _wtof(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_X_TICK_DISTANCE:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, buffer, 128);
+					X_TICK_DISTANCE = _wtof(buffer);
+					countTickSpace();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_Y_TICK_DISTANCE:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
+					Y_TICK_DISTANCE = _wtof(buffer);
+					countTickSpace();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_X_TICK_LABEL:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_X_TICK_LABEL, buffer, 128);
+					X_TICK_LABEL = _wtoi(buffer);
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_Y_TICK_LABEL:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_Y_TICK_LABEL, buffer, 128);
+					Y_TICK_LABEL = _wtoi(buffer);
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_X_TICK_PIXEL:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
+					X_TICK_PIXEL = _wtoi(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_Y_TICK_PIXEL:
+			{
+				if (wmEvent == EN_KILLFOCUS)
+				{
+					LPTSTR buffer = new TCHAR[128];
+					GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
+					Y_TICK_PIXEL = _wtoi(buffer);
+					countTickDistance();
+					invalidWindow(functionDialog);
+					delete buffer;
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_SHOW_GRID:
+			{
+				if (wmEvent == BN_CLICKED)
+				{
+					if (IsDlgButtonChecked(settingDialog, IDC_SHOW_GRID) == BST_CHECKED)
+					{
+						SHOW_GRID = TRUE;
+					}
+					else
+					{
+						SHOW_GRID = FALSE;
+					}
+					updateUI(settingDialog);
+					invalidWindow(functionDialog);
+				}
+				return (INT_PTR)TRUE;
+			}
+			case IDC_AUTO_MODE:
+			{
+				if (wmEvent == BN_CLICKED)
+				{
+					if (IsDlgButtonChecked(settingDialog, IDC_AUTO_MODE) == BST_CHECKED)
+					{
+						AUTO_MODE = TRUE;
+					}
+					else
+					{
+						AUTO_MODE = FALSE;
+					}
+					updateUI(settingDialog);
+					invalidWindow(functionDialog);
+				}
+				return (INT_PTR)TRUE;
+			}
 		}
 		break;
-		}
 	}
 	case WM_NOTIFY:
 	{
