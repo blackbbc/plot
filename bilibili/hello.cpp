@@ -1005,6 +1005,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					ListView_InsertItem(listView, &vitem);
 
 					numFuncs++;
+
+					//随机一个颜色
+					FUNCTION_COLOR = RGB(rand() % 255, rand() % 255, rand() % 255);
+					invalidWindow(settingDialog);
 					invalidWindow(functionDialog);
 				}
 				else

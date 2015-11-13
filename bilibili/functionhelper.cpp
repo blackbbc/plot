@@ -7,12 +7,13 @@ FunctionHelper::FunctionHelper()
 
 }
 
-FunctionHelper::FunctionHelper (LPTSTR raw, DWORD color)
+FunctionHelper::FunctionHelper (LPTSTR raw, DWORD color, FUNC_TYPE type)
 {
 	initialParser();
 	this->_raw = new TCHAR[128];
 	wcscpy(this->_raw, raw);
 	this->_color = color;
+	this->_type = type;
 
 	char *buffer = new char[128];
 	wcstombs(buffer, raw, 128);
