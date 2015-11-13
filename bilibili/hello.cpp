@@ -5,6 +5,9 @@
 #include <chrono>
 #include <CommCtrl.h>
 #include <commdlg.h>
+#include <tchar.h>
+#include <stdio.h>
+#include <strsafe.h>
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
@@ -701,7 +704,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 				ofn.lStructSize = sizeof(ofn);
 				ofn.hwndOwner = window;
-				ofn.lpstrFilter = (LPCWSTR)L"bmp (*.bmp)\0*.bmp\0png (*.png)\0*.png\0All Files (*.*)\0*.*\0";
+				ofn.lpstrFilter = (LPCWSTR)L"bmp (*.bmp)\0*.bmp\0png (*.png)\0*.png\0";
 				ofn.lpstrFile = (LPWSTR)szFileName;
 				ofn.nMaxFile = MAX_PATH;
 				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
@@ -933,6 +936,22 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return (INT_PTR)FALSE;
 }
 
+DWORD g_BytesTransferred = 0;
+VOID CALLBACK FileIOCompletionRoutine(
+	__in  DWORD dwErrorCode,
+	__in  DWORD dwNumberOfBytesTransfered,
+	__in  LPOVERLAPPED lpOverlapped
+	);
+
+VOID CALLBACK FileIOCompletionRoutine(
+	__in  DWORD dwErrorCode,
+	__in  DWORD dwNumberOfBytesTransfered,
+	__in  LPOVERLAPPED lpOverlapped)
+{
+	_tprintf(TEXT("Error code:\t%x\n"), dwErrorCode);
+	_tprintf(TEXT("Number of bytes:\t%x\n"), dwNumberOfBytesTransfered);
+	g_BytesTransferred = dwNumberOfBytesTransfered;
+}
 
 // “设置”框的消息处理程序。
 HDC settingDC = NULL;
@@ -986,6 +1005,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		switch (wmId)
 		{
+			//添加函数
 			case IDADDFUNCTION:
 			{
 				LPTSTR expression = new TCHAR[128];
@@ -1018,6 +1038,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				delete expression;
 				return (INT_PTR)TRUE;
 			}
+			//删除函数
 			case IDDELETEFUNCTION:
 			{
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
@@ -1028,6 +1049,48 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					numFuncs--;
 					invalidWindow(functionDialog);
 				}
+				return (INT_PTR)TRUE;
+			}
+			//导入csv
+			case IDIMPORT:
+			{
+				OPENFILENAME ofn;       // common dialog box structure
+				TCHAR szFile[MAX_PATH];       // buffer for file name
+				HANDLE hf;              // file handle
+				WCHAR   ReadBuffer[BUFFER_SIZE] = { 0 };
+				OVERLAPPED ol = { 0 };
+
+				// Initialize OPENFILENAME
+				ZeroMemory(&ofn, sizeof(ofn));
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = window;
+				ofn.lpstrFile = szFile;
+				// Set lpstrFile[0] to '\0' so that GetOpenFileName does not 
+				// use the contents of szFile to initialize itself.
+				ofn.lpstrFile[0] = '\0';
+				ofn.nMaxFile = sizeof(szFile);
+				ofn.lpstrFilter = L"CSV\0*.csv\0";
+				ofn.nFilterIndex = 1;
+				ofn.lpstrFileTitle = NULL;
+				ofn.nMaxFileTitle = 0;
+				ofn.lpstrInitialDir = NULL;
+				ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+				// Display the Open dialog box. 
+
+				if (GetOpenFileName(&ofn) == TRUE)
+				{
+					hf = CreateFile(ofn.lpstrFile,
+					GENERIC_READ,
+					0,
+					(LPSECURITY_ATTRIBUTES)NULL,
+					OPEN_EXISTING,
+					FILE_ATTRIBUTE_NORMAL,
+					NULL);
+
+					ReadFileEx(hf, ReadBuffer, BUFFER_SIZE - 1, &ol, FileIOCompletionRoutine);
+				}
+				delete [] ReadBuffer;
 				return (INT_PTR)TRUE;
 			}
 			//函数颜色
