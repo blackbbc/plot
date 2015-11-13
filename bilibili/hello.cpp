@@ -508,7 +508,7 @@ void zoom(INT wheelDelta)
 	}
 }
 
-int CaptureAnImage(HWND hWnd)
+int CaptureAnImage(LPTSTR filename)
 {
 	HDC hdcScreen;
 	HDC hdcWindow;
@@ -520,7 +520,7 @@ int CaptureAnImage(HWND hWnd)
 	// Retrieve the handle to a display device context for the client 
 	// area of the window. 
 	hdcScreen = GetDC(NULL);
-	hdcWindow = GetDC(hWnd);
+	hdcWindow = GetDC(functionDialog);
 
 	// Create a compatible DC which is used in a BitBlt from the window DC
 	hdcMemDC = CreateCompatibleDC(hdcWindow);
@@ -528,13 +528,13 @@ int CaptureAnImage(HWND hWnd)
 
 	if (!hdcMemDC)
 	{
-		MessageBox(hWnd, L"CreateCompatibleDC has failed", L"Failed", MB_OK);
+		MessageBox(functionDialog, L"CreateCompatibleDC has failed", L"Failed", MB_OK);
 		goto done;
 	}
 
 	// Get the client area for size calculation
 	RECT rcClient;
-	GetClientRect(hWnd, &rcClient);
+	GetClientRect(functionDialog, &rcClient);
 
 	//FillRect(hdcWindow, &rcClient, (HBRUSH)(COLOR_WINDOW));
 	//The source DC is the entire screen and the destination DC is the current window (HWND)
@@ -547,7 +547,7 @@ int CaptureAnImage(HWND hWnd)
 		0, 0, 
 		SRCCOPY))
 	{
-		MessageBox(hWnd, L"BitBlt has failed", L"Failed", MB_OK);
+		MessageBox(functionDialog, L"BitBlt has failed", L"Failed", MB_OK);
 		goto done;
 	}
 
@@ -556,7 +556,7 @@ int CaptureAnImage(HWND hWnd)
 
 	if (!hbmScreen)
 	{
-		MessageBox(hWnd, L"CreateCompatibleBitmap Failed", L"Failed", MB_OK);
+		MessageBox(functionDialog, L"CreateCompatibleBitmap Failed", L"Failed", MB_OK);
 		goto done;
 	}
 
@@ -571,7 +571,7 @@ int CaptureAnImage(HWND hWnd)
 		0, 0,
 		SRCCOPY))
 	{
-		MessageBox(hWnd, L"BitBlt has failed", L"Failed", MB_OK);
+		MessageBox(functionDialog, L"BitBlt has failed", L"Failed", MB_OK);
 		goto done;
 	}
 
@@ -609,7 +609,7 @@ int CaptureAnImage(HWND hWnd)
 		(BITMAPINFO *)&bi, DIB_RGB_COLORS);
 
 	// A file is created, this is where we will save the screen capture.
-	HANDLE hFile = CreateFile(L"captureqwsx.bmp",
+	HANDLE hFile = CreateFile(filename,
 		GENERIC_WRITE,
 		0,
 		NULL,
@@ -645,7 +645,7 @@ done:
 	DeleteObject(hbmScreen);
 	DeleteObject(hdcMemDC);
 	ReleaseDC(NULL, hdcScreen);
-	ReleaseDC(hWnd, hdcWindow);
+	ReleaseDC(functionDialog, hdcWindow);
 
 	return 0;
 }
@@ -689,6 +689,34 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					EndDialog(settingDialog, LOWORD(wParam));
 					settingDialog = NULL;
 					updateResolution();
+				}
+				break;
+			}
+			case IDM_SAVE_AS_PIC:
+			{
+				OPENFILENAME ofn;
+				char szFileName[MAX_PATH] = "";
+
+				ZeroMemory(&ofn, sizeof(ofn));
+
+				ofn.lStructSize = sizeof(ofn);
+				ofn.hwndOwner = window;
+				ofn.lpstrFilter = (LPCWSTR)L"bmp (*.bmp)\0*.bmp\0png (*.png)\0*.png\0All Files (*.*)\0*.*\0";
+				ofn.lpstrFile = (LPWSTR)szFileName;
+				ofn.nMaxFile = MAX_PATH;
+				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+				ofn.lpstrDefExt = (LPCWSTR)L"bmp";
+
+				if (GetSaveFileName(&ofn))
+				{
+					if (wcscmp(ofn.lpstrFilter, L"bmp (*.bmp)") == 0)
+					{
+						CaptureAnImage(ofn.lpstrFile);
+					}
+					if (wcscmp(ofn.lpstrFilter, L"png (*.png)") == 0)
+					{
+						//´¢´æpng
+					}
 				}
 				break;
 			}
@@ -858,8 +886,8 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		isLButtonDown = FALSE;
 		return (INT_PTR)TRUE;
 	case WM_RBUTTONDOWN:
+		//CaptureAnImage(functionDialog);
 		invalidWindow(hDlg);
-		//CaptureAnImage(hwnd);
 		return (INT_PTR)TRUE;
 	case WM_PAINT:
 		//Ë«»º³å»æÍ¼
