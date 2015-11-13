@@ -990,7 +990,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
 				int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
-				if (iPos != -1)
+				if (iPos >= -1)
 				{
 					ListView_DeleteItem(listView, iPos);
 					numFuncs--;
@@ -1204,6 +1204,54 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				return (INT_PTR)TRUE;
 			}
+			case ID_CHANGE_FUNCTION:
+			{
+				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+				int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+				if (iPos >= 0) 
+				{
+					ListView_EditLabel(listView, iPos);
+				}
+				return (INT_PTR)TRUE;
+			}
+			case ID_CHANGE_COLOR:
+			{
+				CHOOSECOLOR cc;                 // common dialog box structure  
+				static COLORREF acrCustClr[16]; // array of custom colors  
+
+				// Initialize CHOOSECOLOR  
+				ZeroMemory(&cc, sizeof(cc));
+				cc.lStructSize = sizeof(cc);
+				cc.hwndOwner = hDlg;
+				cc.lpCustColors = (LPDWORD)acrCustClr;
+				cc.rgbResult = FUNCTION_COLOR;
+				cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+				if (ChooseColor(&cc) == TRUE)
+				{
+					HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+					int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+					if (iPos >= 0)
+					{
+						funcs[iPos].setColor(cc.rgbResult);
+						invalidWindow(settingDialog);
+						invalidWindow(functionDialog);
+					}
+				}
+				return (INT_PTR)TRUE;
+			}
+			case ID_DELETE:
+			{
+				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+				int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
+				if (iPos >= 0)
+				{
+					ListView_DeleteItem(listView, iPos);
+					numFuncs--;
+					invalidWindow(functionDialog);
+				}
+				return (INT_PTR)TRUE;
+			}
 		}
 		break;
 	}
@@ -1267,7 +1315,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					pt.x,
 					pt.y,
 					0,
-					(HWND)wParam,
+					settingDialog,
 					NULL);
 				// 用完后要销毁菜单资源  
 				DestroyMenu(hroot);
