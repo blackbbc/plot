@@ -3,10 +3,14 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
+#include <fstream>
 #include <CommCtrl.h>
 #include <commdlg.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <locale>
+#include <codecvt>
+#include <cstdlib>
 #include <strsafe.h>
 #include "hello.h"
 #include "config.h"
@@ -762,6 +766,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	default:
 		return ::DefWindowProc(hwnd, Msg, wParam, lParam);
 	}
+	
+	return 0;
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -936,28 +942,16 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 	return (INT_PTR)FALSE;
 }
 
-DWORD g_BytesTransferred = 0;
-VOID CALLBACK FileIOCompletionRoutine(
-	__in  DWORD dwErrorCode,
-	__in  DWORD dwNumberOfBytesTransfered,
-	__in  LPOVERLAPPED lpOverlapped
-	);
-
-VOID CALLBACK FileIOCompletionRoutine(
-	__in  DWORD dwErrorCode,
-	__in  DWORD dwNumberOfBytesTransfered,
-	__in  LPOVERLAPPED lpOverlapped)
-{
-	_tprintf(TEXT("Error code:\t%x\n"), dwErrorCode);
-	_tprintf(TEXT("Number of bytes:\t%x\n"), dwNumberOfBytesTransfered);
-	g_BytesTransferred = dwNumberOfBytesTransfered;
-}
-
 // “设置”框的消息处理程序。
 HDC settingDC = NULL;
 HDC settingMemDC = NULL;
 HBITMAP settingMemBM = NULL;
 PAINTSTRUCT settingPs;
+
+const std::locale empty_locale = std::locale::empty();
+typedef std::codecvt_utf8<wchar_t> converter_type;
+const converter_type* converter = new converter_type;
+const std::locale utf8_locale = std::locale(empty_locale, converter);
 
 INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -1056,9 +1050,6 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				OPENFILENAME ofn;       // common dialog box structure
 				TCHAR szFile[MAX_PATH];       // buffer for file name
-				HANDLE hf;              // file handle
-				WCHAR   ReadBuffer[BUFFER_SIZE] = { 0 };
-				OVERLAPPED ol = { 0 };
 
 				// Initialize OPENFILENAME
 				ZeroMemory(&ofn, sizeof(ofn));
@@ -1078,19 +1069,36 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 				// Display the Open dialog box. 
 
+
 				if (GetOpenFileName(&ofn) == TRUE)
 				{
-					hf = CreateFile(ofn.lpstrFile,
-					GENERIC_READ,
-					0,
-					(LPSECURITY_ATTRIBUTES)NULL,
-					OPEN_EXISTING,
-					FILE_ATTRIBUTE_NORMAL,
-					NULL);
+					std::wifstream fin(ofn.lpstrFile); // On the stack
+					fin.imbue(utf8_locale);
+					std::wstring line;
+					funcs[numFuncs] = FunctionHelper(ofn.lpstrFile, FUNCTION_COLOR, CSV);
+					while (std::getline(fin, line))
+					{
+						auto p = line.find_first_of(L",");
+						double x = _wtof(line.substr(0, p).c_str());
+						double y = _wtof(line.substr(p + 1).c_str());
+						funcs[numFuncs].addPoint(x, y);
+					}
 
-					ReadFileEx(hf, ReadBuffer, BUFFER_SIZE - 1, &ol, FileIOCompletionRoutine);
+					HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+					LVITEM vitem;
+					vitem.mask = LVIF_TEXT;
+
+					vitem.pszText = ofn.lpstrFile;
+					vitem.iItem = numFuncs;
+					vitem.iSubItem = 0;
+					ListView_InsertItem(listView, &vitem);
+
+					numFuncs++;
+					//随机一个颜色
+					FUNCTION_COLOR = RGB(rand() % 255, rand() % 255, rand() % 255);
+					invalidWindow(settingDialog);
+					invalidWindow(functionDialog);
 				}
-				delete [] ReadBuffer;
 				return (INT_PTR)TRUE;
 			}
 			//函数颜色

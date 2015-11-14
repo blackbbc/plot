@@ -4,7 +4,7 @@
 
 FunctionHelper::FunctionHelper()
 {
-
+	initialParser();
 }
 
 FunctionHelper::FunctionHelper (LPTSTR raw, DWORD color, FUNC_TYPE type)
@@ -15,11 +15,13 @@ FunctionHelper::FunctionHelper (LPTSTR raw, DWORD color, FUNC_TYPE type)
 	this->_color = color;
 	this->_type = type;
 
-	char *buffer = new char[128];
-	wcstombs(buffer, raw, 128);
-
-	this->_func = preProcessing(buffer);
-	this->_rpn = getRPN(this->_func);
+	if (type == FUNC)
+	{
+		char *buffer = new char[128];
+		wcstombs(buffer, raw, 128);
+		this->_func = preProcessing(buffer);
+		this->_rpn = getRPN(this->_func);
+	}
 }
 
 void FunctionHelper::updateXVec()
@@ -41,6 +43,13 @@ void FunctionHelper::updateYVec()
 	{
 		yVec[i] = getY(xVec[i]);
 	}
+}
+
+void FunctionHelper::addPoint(double x, double y)
+{
+	xVec[index] = x;
+	yVec[index] = y;
+	index++;
 }
 
 void FunctionHelper::setColor(DWORD color)
@@ -83,23 +92,29 @@ void FunctionHelper::draw(HDC &hdc)
 	DOUBLE XLength = getXRangeLength();
 	DOUBLE YLength = getYRangeLength();
 
-	updateXVec();
-	updateYVec();
-
 	HPEN hpen;
 	HPEN hpenOld;
 
 	hpen = CreatePen(PS_SOLID, 2, _color);
 	hpenOld = (HPEN)SelectObject(hdc, hpen);
 
-	for (i = 0; i < FUNCTION_WIDTH; i++)
+	if (_type == FUNC)
+	{
+		updateXVec();
+		updateYVec();
+		index = FUNCTION_WIDTH;
+	}
+
+	for (i = 0; i < index; i++)
 	{
 		//如果y值非法或者太大，不要绘制，标记号
-		if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
-		{
-			isFirst = TRUE;
-			continue;
-		}
+
+		if (_type == FUNC)
+			if (isnan(yVec[i]) || abs(yVec[i]) > max(abs(Y_RANGE_LEFT), abs(Y_RANGE_RIGHT)) * 2)
+			{
+				isFirst = TRUE;
+				continue;
+			}
 
 		percentX = (xVec[i] - X_RANGE_LEFT) / XLength;
 		percentY = (yVec[i] - Y_RANGE_LEFT) / YLength;
