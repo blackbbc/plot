@@ -1374,20 +1374,23 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					case LVN_ENDLABELEDIT:
 					{
 						LPNMLVDISPINFOW pdi = (LPNMLVDISPINFOW)lParam;
-						if (pdi->item.pszText != NULL)
+						if (funcs[pdi->item.iItem].getType() == FUNC)
 						{
-							funcs[pdi->item.iItem].setFunc((LPTSTR)(pdi->item.pszText));
+							if (pdi->item.pszText != NULL)
+							{
+								funcs[pdi->item.iItem].setFunc((LPTSTR)(pdi->item.pszText));
 
-							HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-							LVITEM vitem;
-							vitem.mask = LVIF_TEXT;
+								HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+								LVITEM vitem;
+								vitem.mask = LVIF_TEXT;
 
-							vitem.pszText = (LPTSTR)pdi->item.pszText;
-							vitem.iItem = pdi->item.iItem;
-							vitem.iSubItem = 0;
-							ListView_SetItem(listView, &vitem);
+								vitem.pszText = (LPTSTR)pdi->item.pszText;
+								vitem.iItem = pdi->item.iItem;
+								vitem.iSubItem = 0;
+								ListView_SetItem(listView, &vitem);
 
-							invalidWindow(functionDialog);
+								invalidWindow(functionDialog);
+							}
 						}
 						return TRUE;
 					}
@@ -1410,6 +1413,11 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 			if (iPos >= 0)
 			{
+				if (funcs[iPos].getType() == FUNC)
+					EnableMenuItem(hroot, ID_CHANGE_FUNCTION, MF_ENABLED);
+				else
+					EnableMenuItem(hroot, ID_CHANGE_FUNCTION, MF_DISABLED);
+
 				// 获取第一个弹出菜单  
 				HMENU hpop = GetSubMenu(hroot, 0);
 				//显示快捷菜单  

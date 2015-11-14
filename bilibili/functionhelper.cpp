@@ -62,6 +62,11 @@ DWORD FunctionHelper::getColor()
 	return _color;
 }
 
+FUNC_TYPE FunctionHelper::getType()
+{
+	return _type;
+}
+
 void FunctionHelper::setFunc(LPTSTR raw)
 {
 	wcscpy(this->_raw, raw);

@@ -33,6 +33,7 @@ public:
 
 	DWORD getColor();
 	LPTSTR getFunc();
+	FUNC_TYPE getType();
 
 	void draw(HDC &hdc);
 };
