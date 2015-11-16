@@ -534,19 +534,7 @@ void zoom(INT wheelDelta)
 	}                                      \
 }
 
-#define DELETE_POINTER(p)              \
-{                                      \
-	if (p)                             \
-	{                                  \
-		delete p;                      \
-		p = NULL;                      \
-	}                                  \
-}
-
-IWICImagingFactory *piFactory = NULL;
-IWICBitmapDecoder* piDecoder;
 IWICBitmapFrameDecode* bitmapSource;
-IWICFormatConverter* piConverter;
 
 UINT PaletteColorCount(GUID guidPixelFormat)
 {
@@ -578,6 +566,7 @@ HRESULT CopyBitmapSourcePalette(IWICBitmapSource *piSource, IWICPalette **ppiPal
 		return E_INVALIDARG;
 
 	IWICPalette *piPalette = NULL;
+	IWICImagingFactory *piFactory = NULL;
 
 	IFS(piFactory->CreatePalette(&piPalette));
 
@@ -600,6 +589,7 @@ HRESULT CopyBitmapSourcePalette(IWICBitmapSource *piSource, IWICPalette **ppiPal
 	}
 
 	RELEASE_INTERFACE(piPalette);
+	RELEASE_INTERFACE(piFactory);
 	return hr;
 }
 
@@ -631,8 +621,10 @@ HRESULT BitmapSourceToBitmapFrameEncode(IWICBitmapSource *piSource, IWICBitmapFr
 	return hr;
 }
 
-void LoadImage(LPTSTR filename)
+HRESULT LoadImage(LPTSTR filename)
 {
+	IWICImagingFactory *piFactory = NULL;
+	IWICBitmapDecoder* piDecoder = NULL;
 	HRESULT hr = CoCreateInstance(
 		CLSID_WICImagingFactory,
 		NULL,
@@ -641,6 +633,11 @@ void LoadImage(LPTSTR filename)
 		(LPVOID*)&piFactory);
 	IFS(piFactory->CreateDecoderFromFilename(filename, NULL, GENERIC_READ, WICDecodeMetadataCacheOnDemand, &piDecoder));
 	IFS(piDecoder->GetFrame(0, &bitmapSource));
+
+	RELEASE_INTERFACE(piDecoder);
+	RELEASE_INTERFACE(piFactory);
+
+	return hr;
 }
 
 
@@ -651,13 +648,12 @@ int SAVE_AS_PNG(LPTSTR filename)
 	SAVE_AS_BMP(L"temp.bmp");
 	LoadImage(L"temp.bmp");
 
+	IWICImagingFactory *piFactory = NULL;
 	IWICBitmapEncoder *piEncoder = NULL;
 	IWICBitmapFrameEncode *piBitmapFrame = NULL;
 	IPropertyBag2 *pPropertybag = NULL;
 
 	IWICStream *piStream = NULL;
-	UINT uiWidth = 640;
-	UINT uiHeight = 480;
 
 	HRESULT hr = CoCreateInstance(
 		CLSID_WICImagingFactory,
@@ -677,54 +673,6 @@ int SAVE_AS_PNG(LPTSTR filename)
 	WICPixelFormatGUID formatGUID = GUID_WICPixelFormat24bppBGR;
 	IFS(piBitmapFrame->SetPixelFormat(&formatGUID));
 
-	//if (SUCCEEDED(hr))
-	//{
-	//	// This is how you customize the TIFF output.
-	//	PROPBAG2 option = { 0 };
-	//	option.pstrName = L"TiffCompressionMethod";
-	//	VARIANT varValue;
-	//	VariantInit(&varValue);
-	//	varValue.vt = VT_UI1;
-	//	varValue.bVal = WICTiffCompressionZIP;
-	//	hr = pPropertybag->Write(1, &option, &varValue);
-	//	if (SUCCEEDED(hr))
-	//	{
-	//		hr = piBitmapFrame->Initialize(pPropertybag);
-	//	}
-	//}
-
-
-	//if (SUCCEEDED(hr))
-	//{
-	//	// We're expecting to write out 24bppRGB. Fail if the encoder cannot do it.
-	//	hr = IsEqualGUID(formatGUID, GUID_WICPixelFormat24bppBGR) ? S_OK : E_FAIL;
-	//}
-
-	//if (SUCCEEDED(hr))
-	//{
-	//	UINT cbStride = (uiWidth * 24 + 7) / 8/***WICGetStride***/;
-	//	UINT cbBufferSize = uiHeight * cbStride;
-
-	//	BYTE *pbBuffer = new BYTE[cbBufferSize];
-
-	//	if (pbBuffer != NULL)
-	//	{
-	//		for (UINT i = 0; i < cbBufferSize; i++)
-	//		{
-	//			pbBuffer[i] = static_cast<BYTE>(rand());
-	//		}
-
-	//		hr = piBitmapFrame->WritePixels(uiHeight, cbStride, cbBufferSize, pbBuffer);
-
-	//		delete[] pbBuffer;
-	//	}
-	//	else
-	//	{
-	//		hr = E_OUTOFMEMORY;
-	//	}
-	//}
-
-
 	IFS(BitmapSourceToBitmapFrameEncode(bitmapSource, piBitmapFrame, formatGUID));
 
 	// ***********************************************
@@ -740,6 +688,9 @@ int SAVE_AS_PNG(LPTSTR filename)
 	RELEASE_INTERFACE(piBitmapFrame);
 	RELEASE_INTERFACE(piEncoder);
 	RELEASE_INTERFACE(piStream);
+
+	RELEASE_INTERFACE(bitmapSource);
+	DeleteFile(L"temp.bmp");
 
 	return hr;
 }
