@@ -863,6 +863,9 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		wmEvent = HIWORD(wParam);
 		switch (wmId)
 		{
+			case IDM_EXIT:
+				DestroyWindow(window);
+				break;
 			case IDM_SETTING:
 			{
 				if (settingDialog == NULL)
@@ -945,6 +948,9 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		WINDOW_WIDTH = LOWORD(lParam);
 		WINDOW_HEIGHT = HIWORD(lParam);
 		updateResolution();
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
 		break;
 	default:
 		return ::DefWindowProc(hwnd, Msg, wParam, lParam);
