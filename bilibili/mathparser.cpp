@@ -328,6 +328,7 @@ double countexp(vector<Token> &rpn, double xValue)
 			break;
 		case 3:
 			ans[top - 2] = token.callTwoArg(ans[top - 2], ans[top - 1]);
+			top -= 1;
 			break;
 		}
 	}
