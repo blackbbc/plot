@@ -16,6 +16,7 @@
 #include "config.h"
 #include "functionhelper.h"
 #include "DebugOut.h"
+#include "wincodec_h.h"
 
 #define EASEOUTCUBIC(x) ((x-1)*(x-1)*(x-1))
 
@@ -515,7 +516,133 @@ void zoom(INT wheelDelta)
 	}
 }
 
-int CaptureAnImage(LPTSTR filename)
+int SAVE_AS_PNG(LPTSTR filename)
+{
+	IWICImagingFactory *piFactory = NULL;
+	IWICBitmapEncoder *piEncoder = NULL;
+	IWICBitmapFrameEncode *piBitmapFrame = NULL;
+	IPropertyBag2 *pPropertybag = NULL;
+
+	IWICStream *piStream = NULL;
+	UINT uiWidth = 640;
+	UINT uiHeight = 480;
+
+	HRESULT hr = CoCreateInstance(
+		CLSID_WICImagingFactory,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_IWICImagingFactory,
+		(LPVOID*)&piFactory);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piFactory->CreateStream(&piStream);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piStream->InitializeFromFilename(L"output.tif", GENERIC_WRITE);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piFactory->CreateEncoder(GUID_ContainerFormatTiff, NULL, &piEncoder);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piEncoder->Initialize(piStream, WICBitmapEncoderNoCache);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piEncoder->CreateNewFrame(&piBitmapFrame, &pPropertybag);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		// This is how you customize the TIFF output.
+		PROPBAG2 option = { 0 };
+		option.pstrName = L"TiffCompressionMethod";
+		VARIANT varValue;
+		VariantInit(&varValue);
+		varValue.vt = VT_UI1;
+		varValue.bVal = WICTiffCompressionZIP;
+		hr = pPropertybag->Write(1, &option, &varValue);
+		if (SUCCEEDED(hr))
+		{
+			hr = piBitmapFrame->Initialize(pPropertybag);
+		}
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piBitmapFrame->SetSize(uiWidth, uiHeight);
+	}
+
+	WICPixelFormatGUID formatGUID = GUID_WICPixelFormat24bppBGR;
+	if (SUCCEEDED(hr))
+	{
+		hr = piBitmapFrame->SetPixelFormat(&formatGUID);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		// We're expecting to write out 24bppRGB. Fail if the encoder cannot do it.
+		hr = IsEqualGUID(formatGUID, GUID_WICPixelFormat24bppBGR) ? S_OK : E_FAIL;
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		UINT cbStride = (uiWidth * 24 + 7) / 8/***WICGetStride***/;
+		UINT cbBufferSize = uiHeight * cbStride;
+
+		BYTE *pbBuffer = new BYTE[cbBufferSize];
+
+		if (pbBuffer != NULL)
+		{
+			for (UINT i = 0; i < cbBufferSize; i++)
+			{
+				pbBuffer[i] = static_cast<BYTE>(rand());
+			}
+
+			hr = piBitmapFrame->WritePixels(uiHeight, cbStride, cbBufferSize, pbBuffer);
+
+			delete[] pbBuffer;
+		}
+		else
+		{
+			hr = E_OUTOFMEMORY;
+		}
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piBitmapFrame->Commit();
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = piEncoder->Commit();
+	}
+
+	if (piFactory)
+		piFactory->Release();
+
+	if (piBitmapFrame)
+		piBitmapFrame->Release();
+
+	if (piEncoder)
+		piEncoder->Release();
+
+	if (piStream)
+		piStream->Release();
+
+	return hr;
+	return 0;
+}
+
+int SAVE_AS_BMP(LPTSTR filename)
 {
 	HDC hdcScreen;
 	HDC hdcWindow;
@@ -708,7 +835,7 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 				ofn.lStructSize = sizeof(ofn);
 				ofn.hwndOwner = window;
-				ofn.lpstrFilter = (LPCWSTR)L"bmp (*.bmp)\0*.bmp\0png (*.png)\0*.png\0";
+				ofn.lpstrFilter = (LPCWSTR)L"bmp (*.bmp)\0*.bmp\0png (*.png)\0*.png\0\0";
 				ofn.lpstrFile = (LPWSTR)szFileName;
 				ofn.nMaxFile = MAX_PATH;
 				ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
@@ -716,13 +843,16 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 
 				if (GetSaveFileName(&ofn))
 				{
-					if (wcscmp(ofn.lpstrFilter, L"bmp (*.bmp)") == 0)
+					switch (ofn.nFilterIndex)
 					{
-						CaptureAnImage(ofn.lpstrFile);
-					}
-					if (wcscmp(ofn.lpstrFilter, L"png (*.png)") == 0)
-					{
-						//´¢´æpng
+					case 1:
+						//´¢´æBMP
+						SAVE_AS_BMP(ofn.lpstrFile);
+					case 2:
+						//´¢´æPNG
+						SAVE_AS_PNG(ofn.lpstrFile);
+					default:
+						break;
 					}
 				}
 				break;
@@ -738,8 +868,8 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			temp.x = pt.x;
 			temp.y = pt.y;
 			ScreenToClient(window, &temp);
-			pt.x = temp.x;
-			pt.y = temp.y;
+			pt.x = (SHORT)temp.x;
+			pt.y = (SHORT)temp.y;
 
 			RECT rcClient;
 			GetClientRect(functionDialog, &rcClient);
@@ -893,10 +1023,6 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			OutputDebugString(L"MouseLeave\n");
 		}
 		isLButtonDown = FALSE;
-		return (INT_PTR)TRUE;
-	case WM_RBUTTONDOWN:
-		//CaptureAnImage(functionDialog);
-		invalidWindow(hDlg);
 		return (INT_PTR)TRUE;
 	case WM_PAINT:
 		//Ë«»º³å»æÍ¼
@@ -1060,7 +1186,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				// use the contents of szFile to initialize itself.
 				ofn.lpstrFile[0] = '\0';
 				ofn.nMaxFile = sizeof(szFile);
-				ofn.lpstrFilter = L"CSV\0*.csv\0";
+				ofn.lpstrFilter = L"CSV\0*.csv\0\0";
 				ofn.nFilterIndex = 1;
 				ofn.lpstrFileTitle = NULL;
 				ofn.nMaxFileTitle = 0;
