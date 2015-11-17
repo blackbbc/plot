@@ -179,7 +179,7 @@ void drawCoordinate()
 	DeleteObject(hpen);
 }
 
-wchar_t *getFormat(INT RATIO)
+wchar_t *getFormat(DOUBLE RATIO)
 {
 	if (RATIO >= 0.001 && RATIO < 0.01)
 	{
@@ -225,7 +225,7 @@ void drawTick()
 		{
 			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
-			swprintf(buffer, 100, getFormat(X_RATIO), i);
+			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
@@ -245,7 +245,7 @@ void drawTick()
 		{
 			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
 			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
-			swprintf(buffer, 100, getFormat(X_RATIO), i);
+			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
 		}
@@ -266,7 +266,7 @@ void drawTick()
 		{
 			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
-			swprintf(buffer, 100, getFormat(Y_RATIO), i);
+			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
@@ -287,7 +287,7 @@ void drawTick()
 		{
 			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
 			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
-			swprintf(buffer, 100, getFormat(Y_RATIO), i);
+			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
@@ -459,39 +459,14 @@ void zoom(INT wheelDelta)
 			if (X_TICK_PIXEL > 60)
 			{
 				X_TICK_PIXEL = 40;
+				X_TICK_DISTANCE /= 2;
 			}
 			if (Y_TICK_PIXEL > 60)
 			{
 				Y_TICK_PIXEL = 40;
+				Y_TICK_DISTANCE /= 2;
 			}
 			
-			//如果一个屏幕的标签过少，tickDistance要变小
-			//while (getXRangeLength() / X_TICK_DISTANCE < 8)
-			//{
-			//	//X_TICK往后移一位
-			//}
-
-			//while (getYRangeLength() / Y_TICK_DISTANCE < 8)
-			//{
-
-			//}
-
-
-			//PIXEL_ROUND = PIXEL_ROUND - 1;
-			//if (PIXEL_ROUND == -1)
-			//{
-			//	PIXEL_ROUND = PIXEL_TYPE.size() - 1;
-			//	DISTANCE_ROUND = DISTANCE_ROUND - 1;
-			//	if (DISTANCE_ROUND == -1)
-			//	{
-			//		DISTANCE_ROUND = DISTANCE_TYPE.size() - 1;
-			//		RATIO /= 10;
-			//	}
-			//	X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			//	Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			//}
-			//X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
-			//Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 		}
 		else
 		{
@@ -516,25 +491,14 @@ void zoom(INT wheelDelta)
 			if (X_TICK_PIXEL < 40)
 			{
 				X_TICK_PIXEL = 60;
+				X_TICK_DISTANCE *= 2;
 			}
 			if (Y_TICK_PIXEL < 40)
 			{
 				Y_TICK_PIXEL = 60;
+				Y_TICK_DISTANCE *= 2;
 			}
 
-			//PIXEL_ROUND = (PIXEL_ROUND + 1) % PIXEL_TYPE.size();
-			//if (PIXEL_ROUND == 0)
-			//{
-			//	DISTANCE_ROUND = (DISTANCE_ROUND + 1) % DISTANCE_TYPE.size();
-			//	if (DISTANCE_ROUND == 0)
-			//	{
-			//		RATIO *= 10;
-			//	}
-			//	X_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			//	Y_TICK_DISTANCE = DISTANCE_TYPE[DISTANCE_ROUND] * RATIO;
-			//}
-			//X_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
-			//Y_TICK_PIXEL = PIXEL_TYPE[PIXEL_ROUND];
 		}
 		else
 		{
