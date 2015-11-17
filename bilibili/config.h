@@ -26,12 +26,11 @@ extern INT Y_TICK_PIXEL;
 extern INT X_TICK_LABEL;
 extern INT Y_TICK_LABEL;
 
-extern std::vector<INT> PIXEL_TYPE;
-extern std::vector<INT> DISTANCE_TYPE;
+extern DOUBLE X_RATIO;
+extern DOUBLE Y_RATIO;
 
-extern DOUBLE RATIO;
-extern INT PIXEL_ROUND;
-extern INT DISTANCE_ROUND;
+extern INT DISTANCE_TYPE[3];
+extern INT DISTANCE_MAP[11];
 
 extern BOOLEAN SHOW_GRID;
 extern BOOLEAN AUTO_MODE;
