@@ -170,8 +170,23 @@ void drawCoordinate()
 	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
 	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
 
-	MoveToEx(hMemDC, 0, ORIGIN_POINT.y, NULL);
-	LineTo(hMemDC, FUNCTION_WIDTH, ORIGIN_POINT.y);
+	int X, Y;
+	if (ORIGIN_POINT.y < 0)
+		Y = 0;
+	else if (ORIGIN_POINT.y > FUNCTION_HEIGHT)
+		Y = FUNCTION_HEIGHT;
+	else
+		Y = ORIGIN_POINT.y;
+	if (ORIGIN_POINT.x < 0)
+		X = 0;
+	else if (ORIGIN_POINT.x > FUNCTION_WIDTH)
+		X = FUNCTION_WIDTH;
+	else
+		X = ORIGIN_POINT.x;
+
+	MoveToEx(hMemDC, 0, Y, NULL);
+	LineTo(hMemDC, FUNCTION_WIDTH, Y);
+
 	MoveToEx(hMemDC, ORIGIN_POINT.x, 0, NULL);
 	LineTo(hMemDC, ORIGIN_POINT.x, FUNCTION_HEIGHT);
 
@@ -217,22 +232,36 @@ void drawTick()
 
 	SetBkMode(hMemDC, TRANSPARENT);
 
+	int X, Y;
+	if (ORIGIN_POINT.y < 0)
+		Y = 0;
+	else if (ORIGIN_POINT.y > FUNCTION_HEIGHT)
+		Y = FUNCTION_HEIGHT;
+	else
+		Y = ORIGIN_POINT.y;
+	if (ORIGIN_POINT.x < 0)
+		X = 0;
+	else if (ORIGIN_POINT.x > FUNCTION_WIDTH)
+		X = FUNCTION_WIDTH;
+	else
+		X = ORIGIN_POINT.x;
+
 	for (i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
 		tick++;
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % X_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, Y - 10, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 10);
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), Y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, Y - 5, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 5);
 		}
 	}
 
@@ -243,16 +272,16 @@ void drawTick()
 		percent = (i - X_RANGE_LEFT) / getXRangeLength();
 		if (tick % X_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 10, NULL);
-			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 10);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, Y - 10, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 10);
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), ORIGIN_POINT.y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), Y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y - 5, NULL);
-			LineTo(hMemDC, FUNCTION_WIDTH * percent, ORIGIN_POINT.y + 5);
+			MoveToEx(hMemDC, FUNCTION_WIDTH * percent, Y - 5, NULL);
+			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 5);
 		}
 	}
 
@@ -264,16 +293,16 @@ void drawTick()
 		percent = 1 - percent;
 		if (tick % Y_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
+			MoveToEx(hMemDC, X - 10, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, X - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, FUNCTION_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 5, FUNCTION_HEIGHT * percent);
+			MoveToEx(hMemDC, X - 5, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, X + 5, FUNCTION_HEIGHT * percent);
 		}
 	}
 
@@ -285,16 +314,16 @@ void drawTick()
 		percent = 1 - percent;
 		if (tick % Y_TICK_LABEL == 0)
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 10, FUNCTION_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 10, FUNCTION_HEIGHT * percent);
+			MoveToEx(hMemDC, X - 10, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, ORIGIN_POINT.x - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, X - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
-			MoveToEx(hMemDC, ORIGIN_POINT.x - 5, FUNCTION_HEIGHT * percent, NULL);
-			LineTo(hMemDC, ORIGIN_POINT.x + 5, FUNCTION_HEIGHT * percent);
+			MoveToEx(hMemDC, X - 5, FUNCTION_HEIGHT * percent, NULL);
+			LineTo(hMemDC, X + 5, FUNCTION_HEIGHT * percent);
 		}
 	}
 
