@@ -225,6 +225,8 @@ void drawTick()
 	font = CreateFont(21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ANTIALIASED_QUALITY, 0, L"Arial");
 	oldFont = (HFONT)SelectObject(hMemDC, font);
 
+	SIZE stringSize;
+
 	INT tick = 0;
 	DOUBLE i, percent;
 	wchar_t buffer[100];
@@ -256,7 +258,8 @@ void drawTick()
 			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 10);
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), Y + 10, tickNumber.c_str(), tickNumber.size());
+			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -276,7 +279,8 @@ void drawTick()
 			LineTo(hMemDC, FUNCTION_WIDTH * percent, Y + 10);
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - 4 * tickNumber.size(), Y + 10, tickNumber.c_str(), tickNumber.size());
+			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + 10, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -297,7 +301,8 @@ void drawTick()
 			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, X - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
+			TextOut(hMemDC, X - stringSize.cx - 12, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -318,7 +323,8 @@ void drawTick()
 			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
-			TextOut(hMemDC, X - 25, FUNCTION_HEIGHT * percent - 8, tickNumber.c_str(), tickNumber.size());
+			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
+			TextOut(hMemDC, X - stringSize.cx - 12, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
