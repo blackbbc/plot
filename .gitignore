@@ -13,3 +13,7 @@ bilibili.v12.suo
 *.pdb
 *.log
 *.bmp
+*.aps
+/bilibili/dlldata.c
+/bilibili/ribbon1.mfcribbon-ms
+/bilibili/wincodec_p.c
