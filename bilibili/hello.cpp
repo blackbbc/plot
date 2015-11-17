@@ -234,19 +234,35 @@ void drawTick()
 
 	SetBkMode(hMemDC, TRANSPARENT);
 
+	int deltaY = 10, deltaX = -12;
+
 	int X, Y;
 	if (ORIGIN_POINT.y < 0)
+	{
 		Y = 0;
+	}
 	else if (ORIGIN_POINT.y > FUNCTION_HEIGHT)
+	{
 		Y = FUNCTION_HEIGHT;
+		deltaY = -30;
+	}
 	else
+	{
 		Y = ORIGIN_POINT.y;
+	}
+
 	if (ORIGIN_POINT.x < 0)
+	{
 		X = 0;
+	}
 	else if (ORIGIN_POINT.x > FUNCTION_WIDTH)
+	{
 		X = FUNCTION_WIDTH;
+	}
 	else
+	{
 		X = ORIGIN_POINT.x;
+	}
 
 	for (i = X_TICK_DISTANCE; i < X_RANGE_RIGHT; i += X_TICK_DISTANCE)
 	{
@@ -259,7 +275,7 @@ void drawTick()
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + deltaY, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -280,7 +296,7 @@ void drawTick()
 			swprintf(buffer, 100, getFormat(X_TICK_DISTANCE), i);
 			tickNumber = buffer;
 			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
-			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + 10, tickNumber.c_str(), tickNumber.size());
+			TextOut(hMemDC, FUNCTION_WIDTH * percent - stringSize.cx / 2, Y + deltaY, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -301,8 +317,12 @@ void drawTick()
 			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
+
 			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
-			TextOut(hMemDC, X - stringSize.cx - 12, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
+			if (ORIGIN_POINT.x < 0)
+				deltaX = stringSize.cx + 12;
+
+			TextOut(hMemDC, X - stringSize.cx + deltaX, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
@@ -323,8 +343,12 @@ void drawTick()
 			LineTo(hMemDC, X + 10, FUNCTION_HEIGHT * percent);
 			swprintf(buffer, 100, getFormat(Y_TICK_DISTANCE), i);
 			tickNumber = buffer;
+
 			GetTextExtentPoint32(hMemDC, tickNumber.c_str(), tickNumber.size(), &stringSize);
-			TextOut(hMemDC, X - stringSize.cx - 12, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
+			if (ORIGIN_POINT.x < 0)
+				deltaX = stringSize.cx + 12;
+
+			TextOut(hMemDC, X - stringSize.cx + deltaX, FUNCTION_HEIGHT * percent - stringSize.cy / 2, tickNumber.c_str(), tickNumber.size());
 		}
 		else
 		{
