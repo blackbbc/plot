@@ -82,13 +82,21 @@ char *getNumber(const char *src, int &i)
 	char *number = new char[32];
 	int j = 0;
 	int n = strlen(src);
+	int dot = 0;
 	while (i < n && isdigit(src[i]) || src[i] == '.')
 	{
+		if (src[i] == '.')
+			dot++;
 		number[j] = src[i];
 		i++;
 		j++;
 	}
 	number[j] = '\0';
+
+	if (dot > 1)
+	{
+		throw std::exception("数字非法");
+	}
 
 	return number;
 }
@@ -286,7 +294,7 @@ vector<Token> getRPN(const char *src)
 
 				if (pri_it == pri.end())
 				{
-					throw std::exception("存在非法字符");
+					throw std::exception(strcat(buffer, " 非法"));
 				}
 
 				int a = pri[expe.top()];
