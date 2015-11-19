@@ -161,9 +161,9 @@ void countTickDistance()
 	ORIGIN_POINT.x = FUNCTION_WIDTH / getXRangeLength() * (0 - X_RANGE_LEFT);
 	ORIGIN_POINT.y = FUNCTION_HEIGHT - FUNCTION_HEIGHT / getYRangeLength() * (0 - Y_RANGE_LEFT);
 
-	//º∆À„Tick Pixel
-	X_TICK_PIXEL = FUNCTION_WIDTH / getXRangeLength() * X_TICK_DISTANCE;
-	Y_TICK_PIXEL = FUNCTION_HEIGHT / getYRangeLength() * Y_TICK_DISTANCE;
+	//º∆À„Tick Distance
+	X_TICK_DISTANCE = getXRangeLength() / FUNCTION_WIDTH * X_TICK_PIXEL;
+	Y_TICK_DISTANCE = getYRangeLength() / FUNCTION_HEIGHT * Y_TICK_PIXEL;
 }
 
 void drawCoordinate()
@@ -1386,7 +1386,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
 					X_RANGE_LEFT = _wtof(buffer);
-					countTickDistance();
+					countTickSpace();
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1399,7 +1399,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
 					X_RANGE_RIGHT = _wtof(buffer);
-					countTickDistance();
+					countTickSpace();
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1412,7 +1412,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
 					Y_RANGE_LEFT = _wtof(buffer);
-					countTickDistance();
+					countTickSpace();
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1425,7 +1425,7 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
 					Y_RANGE_RIGHT = _wtof(buffer);
-					countTickDistance();
+					countTickSpace();
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
