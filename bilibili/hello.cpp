@@ -1239,23 +1239,30 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 				if (expression[0] != 0)
 				{
-					funcs[numFuncs] = FunctionHelper(expression, FUNCTION_COLOR);
+					try
+					{
+						funcs[numFuncs] = FunctionHelper(expression, FUNCTION_COLOR);
 
-					HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-					LVITEM vitem;
-					vitem.mask = LVIF_TEXT;
+						HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+						LVITEM vitem;
+						vitem.mask = LVIF_TEXT;
 
-					vitem.pszText = expression;
-					vitem.iItem = numFuncs;
-					vitem.iSubItem = 0;
-					ListView_InsertItem(listView, &vitem);
+						vitem.pszText = expression;
+						vitem.iItem = numFuncs;
+						vitem.iSubItem = 0;
+						ListView_InsertItem(listView, &vitem);
 
-					numFuncs++;
+						numFuncs++;
 
-					//随机一个颜色
-					FUNCTION_COLOR = RGB(rand() % 255, rand() % 255, rand() % 255);
-					invalidWindow(settingDialog);
-					invalidWindow(functionDialog);
+						//随机一个颜色
+						FUNCTION_COLOR = RGB(rand() % 255, rand() % 255, rand() % 255);
+						invalidWindow(settingDialog);
+						invalidWindow(functionDialog);
+					}
+					catch (std::exception &ex)
+					{
+						MessageBoxA(settingDialog, ex.what(), NULL, NULL);
+					}
 				}
 				else
 				{

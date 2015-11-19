@@ -37,5 +37,6 @@ DOUBLE getXRangeLength();
 DOUBLE getYRangeLength();
 
 std::map<std::string, int> pri;
+std::map<std::string, int>::iterator pri_it;
 
 void invalidWindow(HWND &hwnd);

@@ -35,5 +35,6 @@ extern DOUBLE getXRangeLength();
 extern DOUBLE getYRangeLength();
 
 extern std::map<std::string, int> pri;
+extern std::map<std::string, int>::iterator pri_it;
 
 extern void invalidWindow(HWND &hwnd);

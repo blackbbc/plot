@@ -209,9 +209,13 @@ Token getTokenFromExpe(char *buffer)
 	{
 		return Token{ 3, 0, NULL, myroot };
 	}
-	else
+	else if (strcmp(buffer, "\0") == 0)
 	{
 		return Token{ -1, 0, NULL, NULL };
+	}
+	else
+	{
+		throw std::exception("存在非法字符");
 	}
 }
 
@@ -278,6 +282,12 @@ vector<Token> getRPN(const char *src)
 			else
 			{
 				buffer = getOp(src, i);
+				pri_it = pri.find(buffer);
+
+				if (pri_it == pri.end())
+				{
+					throw std::exception("存在非法字符");
+				}
 				int a = pri[expe.top()];
 				int b = pri[buffer];
 				//如果非空且栈顶元素优先级大于当前符号，出栈
