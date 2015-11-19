@@ -39,6 +39,7 @@ HINSTANCE mHinstance;
 BOOLEAN isLButtonDown;
 
 FunctionHelper funcs[100];
+
 INT numFuncs = 0;
 
 //缩放动画所需要的参数
@@ -462,9 +463,6 @@ void drawGrid()
 
 void drawFunction()
 {
-	hpen = CreatePen(PS_SOLID, 2, RGB(0, 136, 255));
-	hpenOld = (HPEN)SelectObject(hMemDC, hpen);
-
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < numFuncs; i++)
 	{
@@ -474,9 +472,6 @@ void drawFunction()
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
 	//DebugOut() << duration;
-
-	SelectObject(hMemDC, hpenOld);
-	DeleteObject(hpen);
 }
 
 void onPaint() 
@@ -1272,9 +1267,13 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
 				int iPos = ListView_GetNextItem(listView, -1, LVNI_SELECTED);
-				if (iPos >= -1)
+				if (iPos >= 0)
 				{
 					ListView_DeleteItem(listView, iPos);
+					for (int i = iPos; i < numFuncs - 1; i++)
+					{
+						funcs[i] = funcs[i+1];
+					}
 					numFuncs--;
 					invalidWindow(functionDialog);
 				}
@@ -1585,6 +1584,10 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (iPos >= 0)
 				{
 					ListView_DeleteItem(listView, iPos);
+					for (int i = iPos; i < numFuncs - 1; i++)
+					{
+						funcs[i] = funcs[i+1];
+					}
 					numFuncs--;
 					invalidWindow(functionDialog);
 				}
