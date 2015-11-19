@@ -956,9 +956,11 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					case 1:
 						//¥¢¥ÊBMP
 						SAVE_AS_BMP(ofn.lpstrFile);
+						break;
 					case 2:
 						//¥¢¥ÊPNG
 						SAVE_AS_PNG(ofn.lpstrFile);
+						break;
 					default:
 						break;
 					}
