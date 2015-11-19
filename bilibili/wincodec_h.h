@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 8.00.0603 */
-/* at Tue Nov 17 14:36:28 2015
+/* at Thu Nov 19 19:11:30 2015
  */
 /* Compiler settings for wincodec.idl:
     Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 8.00.0603 

@@ -1625,18 +1625,25 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 						{
 							if (pdi->item.pszText != NULL)
 							{
-								funcs[pdi->item.iItem].setFunc((LPTSTR)(pdi->item.pszText));
+								try
+								{
+									funcs[pdi->item.iItem].setFunc((LPTSTR)(pdi->item.pszText));
 
-								HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
-								LVITEM vitem;
-								vitem.mask = LVIF_TEXT;
+									HWND listView = GetDlgItem(hDlg, IDC_FUNCTION_LIST);
+									LVITEM vitem;
+									vitem.mask = LVIF_TEXT;
 
-								vitem.pszText = (LPTSTR)pdi->item.pszText;
-								vitem.iItem = pdi->item.iItem;
-								vitem.iSubItem = 0;
-								ListView_SetItem(listView, &vitem);
+									vitem.pszText = (LPTSTR)pdi->item.pszText;
+									vitem.iItem = pdi->item.iItem;
+									vitem.iSubItem = 0;
+									ListView_SetItem(listView, &vitem);
 
-								invalidWindow(functionDialog);
+									invalidWindow(functionDialog);
+								}
+								catch (std::exception &ex)
+								{
+									MessageBoxA(settingDialog, ex.what(), NULL, NULL);
+								}
 							}
 						}
 						return TRUE;
