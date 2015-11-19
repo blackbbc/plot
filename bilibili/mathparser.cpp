@@ -288,6 +288,7 @@ vector<Token> getRPN(const char *src)
 				{
 					throw std::exception("存在非法字符");
 				}
+
 				int a = pri[expe.top()];
 				int b = pri[buffer];
 				//如果非空且栈顶元素优先级大于当前符号，出栈
@@ -301,6 +302,12 @@ vector<Token> getRPN(const char *src)
 			}
 		}
 	}
+
+	if (rpn.front().iden == -1)
+	{
+		throw std::exception("函数不能为空");
+	}
+
 	return rpn;
 }
 
