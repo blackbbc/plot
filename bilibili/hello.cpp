@@ -166,6 +166,29 @@ void countTickDistance()
 	Y_TICK_DISTANCE = getYRangeLength() / FUNCTION_HEIGHT * Y_TICK_PIXEL;
 }
 
+void countProperConfig()
+{
+	int xBlock = 20;
+	int yBlock = 11;
+	double xDistance = getXRangeLength() / FUNCTION_WIDTH * 1280 / xBlock;
+	double yDistance = getYRangeLength() / FUNCTION_HEIGHT * 720 / yBlock;
+	int i = 0;
+	while (xDistance > DISTANCE_TYPE[i])
+	{
+		i++;
+	}
+	X_DISTANCE_TYPE = i - 1;
+	X_TICK_DISTANCE = DISTANCE_TYPE[X_DISTANCE_TYPE];
+	i = 0;
+	while (yDistance > DISTANCE_TYPE[i])
+	{
+		i++;
+	}
+	Y_DISTANCE_TYPE = i - 1;
+	Y_TICK_DISTANCE = DISTANCE_TYPE[Y_DISTANCE_TYPE];
+	countTickSpace();
+}
+
 void drawCoordinate()
 {
 	hpen = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
@@ -513,12 +536,14 @@ void zoom(INT wheelDelta)
 			if (X_TICK_PIXEL > 60)
 			{
 				X_TICK_PIXEL = 40;
-				X_TICK_DISTANCE /= 2;
+				X_DISTANCE_TYPE -= 1;
+				X_TICK_DISTANCE = DISTANCE_TYPE[X_DISTANCE_TYPE];
 			}
 			if (Y_TICK_PIXEL > 60)
 			{
 				Y_TICK_PIXEL = 40;
-				Y_TICK_DISTANCE /= 2;
+				Y_DISTANCE_TYPE -= 1;
+				Y_TICK_DISTANCE = DISTANCE_TYPE[Y_DISTANCE_TYPE];
 			}
 			
 		}
@@ -545,12 +570,14 @@ void zoom(INT wheelDelta)
 			if (X_TICK_PIXEL < 40)
 			{
 				X_TICK_PIXEL = 60;
-				X_TICK_DISTANCE *= 2;
+				X_DISTANCE_TYPE += 1;
+				X_TICK_DISTANCE = DISTANCE_TYPE[X_DISTANCE_TYPE];
 			}
 			if (Y_TICK_PIXEL < 40)
 			{
 				Y_TICK_PIXEL = 60;
-				Y_TICK_DISTANCE *= 2;
+				Y_DISTANCE_TYPE += 1;
+				Y_TICK_DISTANCE = DISTANCE_TYPE[Y_DISTANCE_TYPE];
 			}
 
 		}
@@ -1146,6 +1173,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject(hbrush);
 
 		onPaint();
+
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
 
 		SelectObject(hMemDC, hOld);
@@ -1395,7 +1423,8 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
 					X_RANGE_LEFT = _wtof(buffer);
-					countTickSpace();
+					countProperConfig();
+					//countTickSpace();
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
