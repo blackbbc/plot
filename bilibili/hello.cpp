@@ -502,15 +502,15 @@ void drawGrid()
 
 void drawFunction()
 {
-	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+	//std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	for (int i = 0; i < numFuncs; i++)
 	{
 		funcs[i].draw(hMemDC);
 	}
-	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+	//std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	//auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
-	DebugOut() << duration;
+	//DebugOut() << duration;
 }
 
 void onPaint() 
@@ -518,13 +518,13 @@ void onPaint()
 	drawGrid();
 	drawCoordinate();
 
-	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+	//std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
 	drawTick();
 
-	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-	DebugOut() << duration;
+	//std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	//auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+	//DebugOut() << duration;
 
 	drawFunction();
 }
@@ -1474,8 +1474,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
-					X_RANGE_LEFT = _wtof(buffer);
-					countProperConfig();
+					double temp = _wtof(buffer);
+					if (X_RANGE_RIGHT - temp < EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						X_RANGE_LEFT = temp;
+						countProperConfig();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1487,8 +1495,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
-					X_RANGE_RIGHT = _wtof(buffer);
-					countTickSpace();
+					double temp = _wtof(buffer);
+					if (temp - X_RANGE_LEFT < EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						X_RANGE_RIGHT = temp;
+						countProperConfig();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1500,8 +1516,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
-					Y_RANGE_LEFT = _wtof(buffer);
-					countTickSpace();
+					double temp = _wtof(buffer);
+					if (Y_RANGE_RIGHT - temp < EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						Y_RANGE_LEFT = temp;
+						countProperConfig();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1513,8 +1537,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
-					Y_RANGE_RIGHT = _wtof(buffer);
-					countTickSpace();
+					double temp = _wtof(buffer);
+					if (temp - Y_RANGE_LEFT < EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						Y_RANGE_RIGHT = temp;
+						countProperConfig();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
