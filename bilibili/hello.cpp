@@ -220,6 +220,22 @@ void drawCoordinate()
 
 wchar_t *getFormat(DOUBLE RATIO)
 {
+	if (RATIO >= 0.0000001 && RATIO < 0.000001)
+	{
+		return L"%.7f";
+	}
+	if (RATIO >= 0.000001 && RATIO < 0.00001)
+	{
+		return L"%.6f";
+	}
+	if (RATIO >= 0.00001 && RATIO < 0.0001)
+	{
+		return L"%.5f";
+	}
+	if (RATIO >= 0.0001 && RATIO < 0.001)
+	{
+		return L"%.4f";
+	}
 	if (RATIO >= 0.001 && RATIO < 0.01)
 	{
 		return L"%.3f";
@@ -494,7 +510,7 @@ void drawFunction()
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
 
-	//DebugOut() << duration;
+	DebugOut() << duration;
 }
 
 void onPaint() 
@@ -1044,6 +1060,7 @@ void initConfig()
 	{
 		distance = types[type] * pow(10, ratio);
 		DISTANCE_TYPE[i] = distance;
+		RATIO_TYPE[i] = -ratio;
 		if (distance == 1)
 		{
 			X_DISTANCE_TYPE = i;
