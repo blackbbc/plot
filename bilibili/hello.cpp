@@ -8,6 +8,8 @@
 #include <commdlg.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
 #include <locale>
 #include <codecvt>
 #include <cstdlib>
@@ -1473,9 +1475,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_X_RANGE_LEFT, buffer, 128);
-					double temp = _wtof(buffer);
-					if (X_RANGE_RIGHT - temp < EPSILON)
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (X_RANGE_RIGHT - temp < EPSILON)
 					{
 						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
 					}
@@ -1494,9 +1501,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_X_RANGE_RIGHT, buffer, 128);
-					double temp = _wtof(buffer);
-					if (temp - X_RANGE_LEFT < EPSILON)
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (temp - X_RANGE_LEFT < EPSILON)
 					{
 						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
 					}
@@ -1515,9 +1527,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_Y_RANGE_LEFT, buffer, 128);
-					double temp = _wtof(buffer);
-					if (Y_RANGE_RIGHT - temp < EPSILON)
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (Y_RANGE_RIGHT - temp < EPSILON)
 					{
 						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
 					}
@@ -1536,9 +1553,14 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_Y_RANGE_RIGHT, buffer, 128);
-					double temp = _wtof(buffer);
-					if (temp - Y_RANGE_LEFT < EPSILON)
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (temp - Y_RANGE_LEFT < EPSILON)
 					{
 						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
 					}
@@ -1557,9 +1579,22 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_X_TICK_DISTANCE, buffer, 128);
-					X_TICK_DISTANCE = _wtof(buffer);
-					countTickSpace();
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (temp <= EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						X_TICK_DISTANCE = _wtof(buffer);
+						countTickSpace();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1570,9 +1605,22 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				if (wmEvent == EN_KILLFOCUS)
 				{
 					LPTSTR buffer = new TCHAR[128];
+					TCHAR *stopString;
 					GetDlgItemText(hDlg, IDC_Y_TICK_DISTANCE, buffer, 128);
-					Y_TICK_DISTANCE = _wtof(buffer);
-					countTickSpace();
+					double temp = wcstod(buffer, &stopString);
+					if (stopString[0] != '\0')
+					{
+						MessageBox(settingDialog, L"非法输入", NULL, NULL);
+					}
+					else if (temp <= EPSILON)
+					{
+						MessageBox(settingDialog, L"请输入有效值", NULL, NULL);
+					}
+					else
+					{
+						Y_TICK_DISTANCE = _wtof(buffer);
+						countTickSpace();
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1584,7 +1632,15 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_TICK_LABEL, buffer, 128);
-					X_TICK_LABEL = _wtoi(buffer);
+					int temp = _wtoi(buffer);
+					if (temp > 0)
+					{
+						X_TICK_LABEL = temp;
+					}
+					else
+					{
+						MessageBox(settingDialog, L"请输入大于0的整数", NULL, NULL);
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1596,7 +1652,15 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_TICK_LABEL, buffer, 128);
-					Y_TICK_LABEL = _wtoi(buffer);
+					int temp = _wtoi(buffer);
+					if (temp > 0)
+					{
+						Y_TICK_LABEL =temp;
+					}
+					else
+					{
+						MessageBox(settingDialog, L"请输入大于0的整数", NULL, NULL);
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1608,8 +1672,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_X_TICK_PIXEL, buffer, 128);
-					X_TICK_PIXEL = _wtoi(buffer);
-					countTickDistance();
+					int temp = _wtoi(buffer);
+					if (temp > 0)
+					{
+						X_TICK_PIXEL = temp;
+						countTickDistance();
+					}
+					else
+					{
+						MessageBox(settingDialog, L"请输入大于0的整数", NULL, NULL);
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
@@ -1621,8 +1693,16 @@ INT_PTR CALLBACK Setting(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					LPTSTR buffer = new TCHAR[128];
 					GetDlgItemText(hDlg, IDC_Y_TICK_PIXEL, buffer, 128);
-					Y_TICK_PIXEL = _wtoi(buffer);
-					countTickDistance();
+					int temp = _wtoi(buffer);
+					if (temp > 0)
+					{
+						Y_TICK_PIXEL = _wtoi(buffer);
+						countTickDistance();
+					}
+					else
+					{
+						MessageBox(settingDialog, L"请输入大于0的整数", NULL, NULL);
+					}
 					invalidWindow(functionDialog);
 					delete buffer;
 				}
