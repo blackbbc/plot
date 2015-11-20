@@ -1033,10 +1033,37 @@ LRESULT  __stdcall MyWinProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void initConfig()
+{
+	int i = 0;
+	int ratio = -30;
+	double distance = 0;
+	double types[3] = { 1, 2 ,5 };
+	int type = 0;
+	for (i = 0; i < TYPE_MAX; i++)
+	{
+		distance = types[type] * pow(10, ratio);
+		DISTANCE_TYPE[i] = distance;
+		if (distance == 1)
+		{
+			X_DISTANCE_TYPE = i;
+			Y_DISTANCE_TYPE = i;
+		}
+
+		type = type + 1;
+		if (type == 3)
+		{
+			type = 0;
+			ratio += 1;
+		}
+	}
+}
+
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	MSG msg;
 
+	initConfig();
 	MyRegisterClass(hInstance);
 	if (!InitInstance(hInstance, nCmdShow))
 	{
