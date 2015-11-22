@@ -524,6 +524,8 @@ void drawMark()
 	double x, y;
 	int screenX, screenY;
 	int padding = 2;
+	int radius = 5;
+	int offset = 6;
 	wchar_t bufferX[100];
 	wchar_t bufferY[100];
 	wchar_t buffer[100] = { 0 };
@@ -567,8 +569,16 @@ void drawMark()
 		coordinate = buffer;
 
 		GetTextExtentPoint32(hMemDC, coordinate.c_str(), coordinate.size(), &stringSize);
-		Rectangle(hMemDC, screenX - padding, screenY - padding, screenX + stringSize.cx + padding, screenY + stringSize.cy + padding);
-		TextOut(hMemDC, screenX, screenY, coordinate.c_str(), coordinate.size());
+
+		hbrush = (HBRUSH)CreateSolidBrush(funcs[closestIndex].getColor());
+		hbrushOld = (HBRUSH)SelectObject(hMemDC, hbrush);
+		Ellipse(hMemDC, screenX - radius, screenY - radius, screenX + radius, screenY + radius);
+		SelectObject(hMemDC, hbrushOld);
+
+		Rectangle(hMemDC, screenX - padding + offset, screenY - padding + offset, screenX + stringSize.cx + padding + offset, screenY + stringSize.cy + padding + offset);
+		TextOut(hMemDC, screenX + offset, screenY + offset, coordinate.c_str(), coordinate.size());
+
+		DeleteObject(hbrush);
 	}
 }
 
