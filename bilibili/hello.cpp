@@ -4,6 +4,7 @@
 #include <vector>
 #include <chrono>
 #include <fstream>
+#include <limits>
 #include <CommCtrl.h>
 #include <commdlg.h>
 #include <tchar.h>
@@ -24,6 +25,7 @@
 
 POINTS pt;
 POINTS ptOld;
+POINTS ptMove;
 
 HDC hdc = NULL;
 HDC hMemDC = NULL;
@@ -515,20 +517,68 @@ void drawFunction()
 	//DebugOut() << duration;
 }
 
+void drawMark()
+{
+	std::wstring coordinate;
+	SIZE stringSize;
+	double x, y;
+	int screenX, screenY;
+	int padding = 2;
+	wchar_t bufferX[100];
+	wchar_t bufferY[100];
+	wchar_t buffer[100] = { 0 };
+
+	x = getXRangeLength() / FUNCTION_WIDTH * (ptMove.x - ORIGIN_POINT.x);
+	y = - getYRangeLength() / FUNCTION_HEIGHT * (ptMove.y - ORIGIN_POINT.y);
+
+	DebugOut() << x;
+	DebugOut() << y;
+
+	//求最近的函数
+	int closestIndex = -1;
+	double minDistance = 1e+233;
+	double closestY = 0;
+
+	for (int i = 0; i < numFuncs; i++)
+	{
+		double temp = funcs[i].getY(x);
+		if (abs(temp - y) < minDistance)
+		{
+			minDistance = abs(temp - y);
+			closestIndex = i;
+			closestY = temp;
+		}
+	}
+
+	if (closestIndex != -1)
+	{
+		double percentY = 1 - (closestY - Y_RANGE_LEFT) / getYRangeLength();
+		screenX = ptMove.x;
+		screenY = (INT)(FUNCTION_HEIGHT * percentY);
+
+		swprintf(bufferX, 100, getFormat(X_TICK_DISTANCE / 10), x);
+		swprintf(bufferY, 100, getFormat(Y_TICK_DISTANCE / 10), closestY);
+		wcscat(buffer, L"(");
+		wcscat(buffer, bufferX);
+		wcscat(buffer, L", ");
+		wcscat(buffer, bufferY);
+		wcscat(buffer, L")");
+
+		coordinate = buffer;
+
+		GetTextExtentPoint32(hMemDC, coordinate.c_str(), coordinate.size(), &stringSize);
+		Rectangle(hMemDC, screenX - padding, screenY - padding, screenX + stringSize.cx + padding, screenY + stringSize.cy + padding);
+		TextOut(hMemDC, screenX, screenY, coordinate.c_str(), coordinate.size());
+	}
+}
+
 void onPaint() 
 {
 	drawGrid();
 	drawCoordinate();
-
-	//std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
 	drawTick();
-
-	//std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-	//auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-	//DebugOut() << duration;
-
 	drawFunction();
+	drawMark();
 }
 
 void setXRange(DOUBLE left, DOUBLE right)
@@ -1167,6 +1217,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		countRange();
 		return (INT_PTR)TRUE;
 	case WM_MOUSEMOVE:
+		ptMove = MAKEPOINTS(lParam);
 		SetFocus(hDlg);
 		if (isLButtonDown) 
 		{
@@ -1185,6 +1236,7 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			TrackMouse(hDlg);
 			Tracking = true;
 		}
+		invalidWindow(functionDialog);
 		return (INT_PTR)TRUE;
 	case WM_LBUTTONDOWN:
 		if (isLButtonDown == FALSE) {
