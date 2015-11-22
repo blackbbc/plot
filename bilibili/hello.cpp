@@ -1291,9 +1291,8 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		onPaint();
 
+		CreateShadow(hdc, hMemDC);
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
-
-		CreateShadow(hdc);
 
 		SelectObject(hMemDC, hOld);
 		DeleteObject(hMemBM);

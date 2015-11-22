@@ -3,4 +3,4 @@
 #include <Windows.h>
 
 void CreateDrawing(HDC hDrawingDC);
-void CreateShadow(HDC hDC);
+void CreateShadow(HDC hDC, HDC hMemDC);

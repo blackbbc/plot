@@ -45,63 +45,53 @@ void CreateDrawing(HDC hDrawingDC)
 	//// Draw some shapes
 	HPEN hPen = ::CreatePen(PS_SOLID, 5, drawingColor);
 	HPEN hOldPen = (HPEN)::SelectObject(hDrawingDC, hPen);
-	//HBRUSH hOldBrush = (HBRUSH)::SelectObject(hDrawingDC, (HBRUSH)GetStockObject(HOLLOW_BRUSH));
 	HBRUSH hOldBrush = (HBRUSH)::SelectObject(hDrawingDC, CreateSolidBrush(drawingColor));
-	//::MoveToEx(hDrawingDC, 30, 30, NULL);
-	//::LineTo(hDrawingDC, 200, 60);
-	//::MoveToEx(hDrawingDC, 30, 60, NULL);
-	//::LineTo(hDrawingDC, 200, 30);
-	//::Rectangle(hDrawingDC, 80, 130, 140, 180);
-	//::Ellipse(hDrawingDC, 120, 140, 180, 170);
-	::Rectangle(hDrawingDC, 160, 130, 220, 180);
+	::Rectangle(hDrawingDC, 0, 0, 50, 50);
 	::SelectObject(hDrawingDC, hOldBrush);
 	::SelectObject(hDrawingDC, hOldPen);
 	::DeleteObject(hPen);
 }
 
-void CreateShadow(HDC hDC)
+void CreateShadow(HDC hDC, HDC hMemDC)
 {
 	int i, j, k, l;
-	RECT rect = { 0, 0, 300, 200 };
+	RECT rect = { 0, 0, 100, 100 };
 
 	m_hBgDC = ::CreateCompatibleDC(hDC);
-	m_hBgBitmap = CreateCompatibleBitmap(hDC, 300, 200);
+	m_hBgBitmap = CreateCompatibleBitmap(hDC, 100, 100);
 	m_hOldBgBitmap = (HBITMAP)::SelectObject(m_hBgDC, m_hBgBitmap);
 
 	m_hShadowDC = ::CreateCompatibleDC(hDC);
-	m_hShadowBitmap = CreateCompatibleBitmap(hDC, 300, 200);
+	m_hShadowBitmap = CreateCompatibleBitmap(hDC, 100, 100);
 	m_hOldShadowBitmap = (HBITMAP)::SelectObject(m_hShadowDC, m_hShadowBitmap);
 
-	HBRUSH hbrush = CreateSolidBrush(BACKGROUND_COLOR);
-	FillRect(m_hBgDC, &rect, hbrush);
-	FillRect(m_hShadowDC, &rect, hbrush);
-
-	DeleteObject(hbrush);
+	//BitBlt(m_hShadowDC, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+	StretchBlt(m_hShadowDC, 0, 0, 100, 100, hMemDC, 10, 10, 110, 110, SRCCOPY);
 
 	// Create temporary DC and bitmap
 	HDC hTempDC = ::CreateCompatibleDC(hDC);
-	HBITMAP hTempBitmap = CreateCompatibleBitmap(hDC, 300, 200);
+	HBITMAP hTempBitmap = CreateCompatibleBitmap(hDC, 100, 100);
 	HBITMAP hOldTempBitmap = (HBITMAP)::SelectObject(hTempDC, hTempBitmap);
 	HDC hTempDC2 = ::CreateCompatibleDC(hDC);
-	HBITMAP hTempBitmap2 = CreateCompatibleBitmap(hDC, 300, 200);
+	HBITMAP hTempBitmap2 = CreateCompatibleBitmap(hDC, 100, 100);
 	HBITMAP hOldTempBitmap2 = (HBITMAP)::SelectObject(hTempDC2, hTempBitmap2);
 	HDC hTempDC3 = ::CreateCompatibleDC(hDC);
-	HBITMAP hTempBitmap3 = CreateCompatibleBitmap(hDC, 300, 200);
+	HBITMAP hTempBitmap3 = CreateCompatibleBitmap(hDC, 100, 100);
 	HBITMAP hOldTempBitmap3 = (HBITMAP)::SelectObject(hTempDC3, hTempBitmap3);
 
 	// Clear background
 	HBRUSH hBgBrush = ::CreateSolidBrush(transparentColor);
-	::FillRect(hTempDC, &rect, hBgBrush);
-	::FillRect(hTempDC2, &rect, hBgBrush);
-	::BitBlt(hTempDC3, 0, 0, 300, 200, m_hBgDC, 0, 0, SRCCOPY);
-	::DeleteObject(hBgBrush);
+	FillRect(hTempDC, &rect, hBgBrush);
+	FillRect(hTempDC2, &rect, hBgBrush);
+	StretchBlt(hTempDC3, 0, 0, 100, 100, hMemDC, 10, 10, 110, 110, SRCCOPY);
+	DeleteObject(hBgBrush);
 
 	// Create drawing on shadow DC
 	CreateDrawing(hTempDC2);
 
 	// Draw memory DC on temporary DC
 	int shadowOffset = 5;
-	::TransparentBlt(hTempDC, shadowOffset, shadowOffset, 300, 200, hTempDC2, 0, 0, 300, 200, transparentColor);
+	::TransparentBlt(hTempDC, shadowOffset, shadowOffset, 100, 100, hTempDC2, 0, 0, 100, 100, transparentColor);
 
 	// Get source bitmap
 	BITMAP bmpSrc;
@@ -344,5 +334,6 @@ void CreateShadow(HDC hDC)
 	// Create drawing on shadow DC
 	CreateDrawing(m_hShadowDC);
 
-	BitBlt(hDC, 20, 430, 300, 200, m_hShadowDC, 0, 0, SRCCOPY);
+	StretchBlt(hMemDC, 10, 10, 110, 110, m_hShadowDC, 0, 0, 100, 100, SRCCOPY);
+	//BitBlt(hDC, 10, 10, 100, 100, m_hShadowDC, 0, 0, SRCCOPY);
 }
