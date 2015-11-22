@@ -18,6 +18,7 @@
 #include "hello.h"
 #include "config.h"
 #include "functionhelper.h"
+#include "shadow.h"
 #include "DebugOut.h"
 #include "wincodec_h.h"
 
@@ -1291,6 +1292,8 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 		onPaint();
 
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
+
+		CreateShadow(hdc);
 
 		SelectObject(hMemDC, hOld);
 		DeleteObject(hMemBM);
