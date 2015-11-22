@@ -569,15 +569,26 @@ void drawMark()
 
 		coordinate = buffer;
 
-		GetTextExtentPoint32(hMemDC, coordinate.c_str(), coordinate.size(), &stringSize);
-
 		hbrush = (HBRUSH)CreateSolidBrush(funcs[closestIndex].getColor());
 		hbrushOld = (HBRUSH)SelectObject(hMemDC, hbrush);
 		Ellipse(hMemDC, screenX - radius, screenY - radius, screenX + radius, screenY + radius);
 		SelectObject(hMemDC, hbrushOld);
 
-		Rectangle(hMemDC, screenX - padding + offset, screenY - padding + offset, screenX + stringSize.cx + padding + offset, screenY + stringSize.cy + padding + offset);
-		TextOut(hMemDC, screenX + offset, screenY + offset, coordinate.c_str(), coordinate.size());
+		GetTextExtentPoint32(hMemDC, coordinate.c_str(), coordinate.size(), &stringSize);
+
+		CreateShadow(
+			hdc,
+			hMemDC,
+			RECT{
+				screenX - padding + offset,
+				screenY - padding + offset,
+				screenX + stringSize.cx + padding + offset,
+				screenY + stringSize.cy + padding + offset
+			},
+			coordinate,
+			stringSize);
+		//Rectangle(hMemDC, screenX - padding + offset, screenY - padding + offset, screenX + stringSize.cx + padding + offset, screenY + stringSize.cy + padding + offset);
+		//TextOut(hMemDC, screenX + offset, screenY + offset, coordinate.c_str(), coordinate.size());
 
 		DeleteObject(hbrush);
 	}
@@ -1291,7 +1302,6 @@ INT_PTR CALLBACK Func(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 		onPaint();
 
-		CreateShadow(hdc, hMemDC);
 		BitBlt(hdc, 0, 0, FUNCTION_WIDTH, FUNCTION_HEIGHT, hMemDC, 0, 0, SRCCOPY);
 
 		SelectObject(hMemDC, hOld);
