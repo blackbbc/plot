@@ -8,53 +8,17 @@ HBITMAP m_hShadowBitmap;
 COLORREF transparentColor = RGB(128, 128, 128);
 COLORREF shadowColor = RGB(0, 0, 0);
 
-void CreateDrawing(HDC hDrawingDC)
+void CreateDrawing(HDC hDrawingDC, RECT &area)
 {
-	COLORREF drawingColor = RGB(0, 0, 255);
-
-	// Draw some text
-	//LOGFONT lf;
-	//lf.lfHeight = -MulDiv(24, ::GetDeviceCaps(::GetDC(NULL), LOGPIXELSY), 72);
-	//lf.lfWidth = 0;
-	//lf.lfEscapement = 0;
-	//lf.lfOrientation = 0;
-	//lf.lfWeight = FW_BOLD;
-	//lf.lfItalic = FALSE;
-	//lf.lfUnderline = FALSE;
-	//lf.lfStrikeOut = FALSE;
-	//lf.lfCharSet = DEFAULT_CHARSET;
-	//lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
-	//lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	//lf.lfQuality = DEFAULT_QUALITY;
-	//lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	//_tcscpy(lf.lfFaceName, _T("Times New Roman"));
-	//HFONT hFont = ::CreateFontIndirect(&lf);
-	//HFONT hOldFont = (HFONT)::SelectObject(hDrawingDC, hFont);
-	//COLORREF oldTextColor = ::SetTextColor(hDrawingDC, drawingColor);
-	//int oldTextMode = ::SetBkMode(hDrawingDC, TRANSPARENT);
-	//_TCHAR lpszText[] = _T("Hello, World !!!");
-	//::TextOut(hDrawingDC,35, 75, lpszText, _tcslen(lpszText));
-	//::SelectObject(hDrawingDC, hOldFont);
-	//::DeleteObject(hFont);
-	//::SetBkMode(hDrawingDC, oldTextMode);
-	//::SetTextColor(hDrawingDC, oldTextColor);
-
-	//// Draw some shapes
-	HPEN hPen = ::CreatePen(PS_SOLID, 5, drawingColor);
-	HPEN hOldPen = (HPEN)::SelectObject(hDrawingDC, hPen);
-	HBRUSH hOldBrush = (HBRUSH)::SelectObject(hDrawingDC, CreateSolidBrush(drawingColor));
-	Rectangle(hDrawingDC, 0, 0, 10, 10);
-	SelectObject(hDrawingDC, hOldBrush);
-	SelectObject(hDrawingDC, hOldPen);
-	DeleteObject(hPen);
+	Rectangle(hDrawingDC, 0, 0, area.right - 10, area.bottom - 10);
 }
 
-void CreateShadow(HDC hDC, HDC hMemDC, RECT area, std::wstring text, SIZE textSize)
+void CreateShadow(HDC hDC, HDC hMemDC, RECT &area)
 {
 	int i, j, k, l;
-	area.right = area.left + 50;
-	area.bottom = area.top + 100;
 	RECT rect = { 0, 0, area.right - area.left, area.bottom - area.top };
+	rect.right += 10;
+	rect.bottom += 10;
 
 	m_hShadowDC = ::CreateCompatibleDC(hDC);
 	m_hShadowBitmap = CreateCompatibleBitmap(hDC, rect.right, rect.bottom);
@@ -81,7 +45,7 @@ void CreateShadow(HDC hDC, HDC hMemDC, RECT area, std::wstring text, SIZE textSi
 	DeleteObject(hBgBrush);
 
 	// Create drawing on shadow DC
-	CreateDrawing(hTempDC2);
+	CreateDrawing(hTempDC2, rect);
 
 	// Draw memory DC on temporary DC
 	int shadowOffset = 5;
@@ -326,7 +290,7 @@ void CreateShadow(HDC hDC, HDC hMemDC, RECT area, std::wstring text, SIZE textSi
 	}
 
 	// Create drawing on shadow DC
-	CreateDrawing(m_hShadowDC);
+	CreateDrawing(m_hShadowDC, rect);
 
 	StretchBlt(hMemDC, area.left, area.top, rect.right, rect.bottom, m_hShadowDC, rect.left, rect.top, rect.right, rect.bottom, SRCCOPY);
 }

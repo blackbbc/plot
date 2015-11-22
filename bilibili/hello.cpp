@@ -584,11 +584,10 @@ void drawMark()
 				screenY - padding + offset,
 				screenX + stringSize.cx + padding + offset,
 				screenY + stringSize.cy + padding + offset
-			},
-			coordinate,
-			stringSize);
+			}
+		);
 		//Rectangle(hMemDC, screenX - padding + offset, screenY - padding + offset, screenX + stringSize.cx + padding + offset, screenY + stringSize.cy + padding + offset);
-		//TextOut(hMemDC, screenX + offset, screenY + offset, coordinate.c_str(), coordinate.size());
+		TextOut(hMemDC, screenX + offset, screenY + offset, coordinate.c_str(), coordinate.size());
 
 		DeleteObject(hbrush);
 	}
